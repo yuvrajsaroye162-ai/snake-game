@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RetroSnake Deluxe - Synchronized Themes Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=Cinzel:wght@700&family=Fira+Code:wght@700&family=Inter:wght@400;700;900&family=Montserrat:wght@800&family=Orbitron:wght@700;900&family=Press+Start+2P&family=Rajdhani:wght@700&family=Roboto+Mono:wght@700&family=VT323&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #050811;
+            --card-bg: rgba(18, 25, 39, 0.65);
+            --card-border: 1px solid rgba(255, 255, 255, 0.12);
+            --card-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
+            --card-backdrop: blur(16px);
+            --accent: #f1f2f6;
+            --accent-glow: rgba(241, 242, 246, 0.4);
+            --secondary-accent: #0056b3;
+            --text: #f0f6fc;
+            --theme-font: 'Roboto Mono', monospace;
+            --btn-bg: linear-gradient(180deg, #f1f2f6 0%, #0056b3 100%);
+            --btn-shadow: 0 5px 0 #003d80, 0 8px 10px rgba(0,0,0,0.5);
+            --btn-border: 1px solid rgba(255,255,255,0.4);
+            --btn-radius: 6px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--theme-font);
+            user-select: none;
+            transition: font-family 0.3s ease, background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text);
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: 15px 10px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Animated Ambient Background Canvas */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            filter: blur(40px);
+            pointer-events: none;
+        }
+
+        .single-column-app {
+            width: 100%;
+            max-width: 550px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: center;
+            z-index: 1;
+        }
+
+        /* Dynamic Morphism Card Base */
+        .card {
+            width: 100%;
+            background: var(--card-bg);
+            backdrop-filter: var(--card-backdrop);
+            -webkit-backdrop-filter: var(--card-backdrop);
+            border: var(--card-border);
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .header {
+            text-align: center;
+        }
+
+        .logo {
+            font-size: clamp(1.4rem, 5vw, 2rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, var(--accent), #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            font-size: clamp(0.9rem, 3.5vw, 1.2rem);
+            font-weight: 700;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .stat-item span {
+            color: var(--accent);
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            border: var(--card-border);
+            touch-action: none;
+        }
+
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background-color: #000;
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(7, 10, 18, 0.88);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            z-index: 10;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .hidden { display: none !important; }
+
+        .btn {
+            background: var(--btn-bg);
+            color: #fff;
+            border: var(--btn-border);
+            padding: 12px 20px;
+            border-radius: var(--btn-radius);
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: transform 0.1s ease, filter 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: var(--btn-shadow);
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:active { transform: scale(0.95); }
+
+        .btn-pause {
+            width: 100%;
+            padding: 14px;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: none;
+        }
+
+        .dpad-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            width: 100%;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+
+        .dpad-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text);
+            font-size: 1.4rem;
+            height: 55px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--btn-shadow);
+        }
+
+        .dpad-btn:active {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #8b949e;
+        }
+
+        .select-input, .text-input {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            border-radius: 10px;
+            outline: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .user-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 14px;
+            border-radius: 12px;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 8px 10px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        @media (max-width: 400px) {
+            body { padding: 8px 5px; }
+            .card { padding: 12px; gap: 10px; }
+            .dpad-btn { height: 48px; font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<div class="single-column-app">
+
+    <div class="card header">
+        <div class="logo">Snake Motion HD</div>
+        <div class="stats-bar">
+            <div class="stat-item">Score: <span id="currentScore">0</span></div>
+            <div class="stat-item">High: <span id="highScore">0</span></div>
+        </div>
+    </div>
+
+    <div class="canvas-container">
+        <canvas id="gameCanvas" width="600" height="600"></canvas>
+        
+        <div id="gameOverlay" class="overlay">
+            <h1 id="overlayTitle" style="font-size: clamp(1.6rem, 6vw, 2.2rem); text-shadow: 0 0 10px var(--accent-glow);">READY PLAYER ONE</h1>
+            <p id="overlaySub" style="color: #8b949e; font-size: 0.9rem;">Soft Cushy Snake • Obsidian Metallic</p>
+            <button class="btn" onclick="startGame()">Start Game</button>
+        </div>
+
+        <div id="pauseOverlay" class="overlay hidden">
+            <h1 style="font-size: 2.2rem; text-shadow: 0 0 10px var(--accent-glow);">GAME PAUSED</h1>
+            <p style="color: #8b949e; font-size: 0.9rem;">Take a breather...</p>
+            <button class="btn" onclick="togglePause()">Resume Game</button>
+        </div>
+
+        <div id="authModal" class="overlay hidden">
+            <h2>Select Profile</h2>
+            <input type="text" id="usernameInput" class="text-input" placeholder="Enter Username..." style="width: 85%;">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                <button class="btn" onclick="loginUser()">Save Login</button>
+                <button class="btn btn-secondary" onclick="loginGuest()">Guest Mode</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAUSE & ON-SCREEN CONTROLS -->
+    <div class="card">
+        <button id="pauseBtn" class="btn btn-pause" onclick="togglePause()">⏸ Pause Game</button>
+
+        <div class="label" style="text-align: center; margin-top: 4px;">Controls</div>
+        <div class="dpad-container">
+            <div></div>
+            <button class="dpad-btn" onclick="setDirection(0, -1)">▲</button>
+            <div></div>
+            <button class="dpad-btn" onclick="setDirection(-1, 0)">◄</button>
+            <button class="dpad-btn" onclick="setDirection(0, 1)">▼</button>
+            <button class="dpad-btn" onclick="setDirection(1, 0)">►</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="user-row">
+            <span>Player: <strong id="userDisplayName">Guest</strong></span>
+            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="toggleAuthModal()">Switch User</button>
+        </div>
+
+        <div class="control-group">
+            <label class="label" for="difficultySelect">Speed & Difficulty</label>
+            <select id="difficultySelect" class="select-input" onchange="changeDifficulty()">
+                <option value="easy">Easy (Relaxed)</option>
+                <option value="medium" selected>Medium (Classic)</option>
+                <option value="hard">Hard (Insane Speed)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label class="label" for="themeSelect">Theme & Morphism Style</label>
+            <select id="themeSelect" class="select-input" onchange="applyTheme(this.value)"></select>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="label">Top Players</div>
+        <table class="leaderboard-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Player</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboardBody"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+/* --- DYNAMIC THEME-SENSITIVE BACKGROUND CANVAS --- */
+const bgCanvas = document.getElementById('bgCanvas');
+const bgCtx = bgCanvas.getContext('2d');
+
+let activePrimaryColor = '#f1f2f6';
+let activeSecondaryColor = '#0056b3';
+
+function resizeBg() {
+    bgCanvas.width = window.innerWidth;
+    bgCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeBg);
+resizeBg();
+
+const bgOrbs = [];
+for (let i = 0; i < 8; i++) {
+    bgOrbs.push({
+        x: Math.random() * bgCanvas.width,
+        y: Math.random() * bgCanvas.height,
+        radius: Math.random() * 250 + 150,
+        vx: (Math.random() - 0.5) * 1.2,
+        vy: (Math.random() - 0.5) * 1.2,
+        useSecondary: i % 2 === 0
+    });
+}
+
+function renderMainBackground() {
+    bgCtx.fillStyle = '#050811';
+    bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+
+    bgOrbs.forEach((orb) => {
+        orb.x += orb.vx;
+        orb.y += orb.vy;
+
+        if (orb.x < -100 || orb.x > bgCanvas.width + 100) orb.vx *= -1;
+        if (orb.y < -100 || orb.y > bgCanvas.height + 100) orb.vy *= -1;
+
+        const orbColor = orb.useSecondary ? activeSecondaryColor : activePrimaryColor;
+
+        const grad = bgCtx.createRadialGradient(orb.x, orb.y, 10, orb.x, orb.y, orb.radius);
+        grad.addColorStop(0, orbColor + '55'); 
+        grad.addColorStop(1, 'transparent');
+
+        bgCtx.fillStyle = grad;
+        bgCtx.beginPath();
+        bgCtx.arc(orb.x, orb.y, orb.radius, 0, Math.PI * 2);
+        bgCtx.fill();
+    });
+}
+
+
+/* --- GAME ENGINE & PROCEDURAL MAP THEMES --- */
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+const GRID_CELLS = 22;
+const CELL_SIZE = canvas.width / GRID_CELLS; 
+
+let snake = [];
+let food = { x: 0, y: 0 };
+let dirX = 1, dirY = 0;
+let nextDirX = 1, nextDirY = 0;
+let score = 0;
+let lastTickTime = 0;
+let stepProgress = 0; 
+let isRunning = false;
+let isPaused = false;
+let particles = [];
+let animTime = 0;
+
+let currentUser = localStorage.getItem('snake_user') || 'Guest';
+let difficulties = { easy: 140, medium: 95, hard: 60 };
+let currentDifficulty = 'medium';
+
+/* --- 20 Themes across 5 Design Morphisms --- */
+const themes = [
+    // --- CLAYMORPHISM ---
+    { 
+        name: "1. Lavender Dream [Clay]", 
+        morphism: "claymorphism",
+        head: "#a29bfe", body: "#6c5ce7", food: "#00cec9", accent: "#a29bfe", secondary: "#6c5ce7",
+        font: "'Cinzel', serif", bgType: "waves"
+    },
+    { 
+        name: "2. Candy Pop [Clay]", 
+        morphism: "claymorphism",
+        head: "#ff7675", body: "#d63031", food: "#fdcb6e", accent: "#ff7675", secondary: "#e84393",
+        font: "'Montserrat', sans-serif", bgType: "floatingBubbles"
+    },
+    { 
+        name: "3. Playful Mint [Clay]", 
+        morphism: "claymorphism",
+        head: "#55efc4", body: "#00b894", food: "#e84393", accent: "#55efc4", secondary: "#00b894",
+        font: "'Inter', sans-serif", bgType: "radialPulse"
+    },
+    { 
+        name: "4. Toybox Yellow [Clay]", 
+        morphism: "claymorphism",
+        head: "#ffeaa7", body: "#fdcb6e", food: "#0984e3", accent: "#ffeaa7", secondary: "#fd79a8",
+        font: "'Press Start 2P', cursive", bgType: "floatingBubbles"
+    },
+
+    // --- GLASSMORPHISM ---
+    { 
+        name: "5. Cyber Neon [Glass]", 
+        morphism: "glass",
+        head: "#00f2fe", body: "#0284c7", food: "#ff0844", accent: "#00f2fe", secondary: "#7928ca",
+        font: "'Orbitron', sans-serif", bgType: "cyberGrid"
+    },
+    { 
+        name: "6. Deep Ocean [Glass]", 
+        morphism: "glass",
+        head: "#38bdf8", body: "#0369a1", food: "#f43f5e", accent: "#38bdf8", secondary: "#0284c7",
+        font: "'Montserrat', sans-serif", bgType: "waves"
+    },
+    { 
+        name: "7. Cosmic Nebula [Glass]", 
+        morphism: "glass",
+        head: "#c084fc", body: "#7e22ce", food: "#facc15", accent: "#c084fc", secondary: "#3b82f6",
+        font: "'Chakra Petch', sans-serif", bgType: "starfield"
+    },
+    { 
+        name: "8. Cherry Sakura [Glass]", 
+        morphism: "glass",
+        head: "#f472b6", body: "#be185d", food: "#4ade80", accent: "#f472b6", secondary: "#fb7185",
+        font: "'Cinzel', serif", bgType: "floatingBubbles"
+    },
+
+    // --- NEOMORPHISM ---
+    { 
+        name: "9. Dark Mode Charcoal [Neo]", 
+        morphism: "neomorphism",
+        head: "#60a5fa", body: "#2563eb", food: "#f87171", accent: "#60a5fa", secondary: "#1d4ed8",
+        font: "'Inter', sans-serif", bgType: "radialPulse"
+    },
+    { 
+        name: "10. Soft Ice Blue [Neo]", 
+        morphism: "neomorphism",
+        head: "#38bdf8", body: "#0284c7", food: "#fb923c", accent: "#38bdf8", secondary: "#0369a1",
+        font: "'Roboto Mono', monospace", bgType: "waves"
+    },
+    { 
+        name: "11. Industrial Steel [Neo]", 
+        morphism: "neomorphism",
+        head: "#facc15", body: "#ca8a04", food: "#ef4444", accent: "#facc15", secondary: "#854d0e",
+        font: "'Rajdhani', sans-serif", bgType: "cyberGrid"
+    },
+    { 
+        name: "12. Emerald Luxury [Neo]", 
+        morphism: "neomorphism",
+        head: "#34d399", body: "#059669", food: "#fb7185", accent: "#34d399", secondary: "#047857",
+        font: "'Cinzel', serif", bgType: "radialPulse"
+    },
+
+    // --- CYBERPUNK GLOWMORPHISM ---
+    { 
+        name: "13. Neon Matrix [Glow]", 
+        morphism: "glowmorphism",
+        head: "#22c55e", body: "#15803d", food: "#facc15", accent: "#22c55e", secondary: "#16a34a",
+        font: "'VT323', monospace", bgType: "matrixRain"
+    },
+    { 
+        name: "14. Synthwave Sunset [Glow]", 
+        morphism: "glowmorphism",
+        head: "#ff007f", body: "#b5005b", food: "#00f2fe", accent: "#ff007f", secondary: "#7928ca",
+        font: "'Rajdhani', sans-serif", bgType: "cyberGrid"
+    },
+    { 
+        name: "15. Solar Flare [Glow]", 
+        morphism: "glowmorphism",
+        head: "#ff9f43", body: "#ee5253", food: "#feca57", accent: "#ff9f43", secondary: "#ee5253",
+        font: "'Chakra Petch', sans-serif", bgType: "radialPulse"
+    },
+    { 
+        name: "16. Overclock Violet [Glow]", 
+        morphism: "glowmorphism",
+        head: "#00d2d3", body: "#54a0ff", food: "#ff9ff3", accent: "#00d2d3", secondary: "#54a0ff",
+        font: "'Orbitron', sans-serif", bgType: "starfield"
+    },
+
+    // --- SKEUOMORPHISM ---
+    { 
+        name: "17. Classic Arcade CRT [Skeuo]", 
+        morphism: "skeuomorphism",
+        head: "#4cd137", body: "#44bd32", food: "#e1b12c", accent: "#4cd137", secondary: "#44bd32",
+        font: "'Press Start 2P', cursive", bgType: "cyberGrid"
+    },
+    { 
+        name: "18. Vintage Leather & Brass [Skeuo]", 
+        morphism: "skeuomorphism",
+        head: "#e1b12c", body: "#cd84f1", food: "#ff3838", accent: "#e1b12c", secondary: "#cd84f1",
+        font: "'Cinzel', serif", bgType: "radialPulse"
+    },
+    { 
+        name: "19. Blueprint Drafting [Skeuo]", 
+        morphism: "skeuomorphism",
+        head: "#70a1ff", body: "#1e90ff", food: "#ff6b81", accent: "#70a1ff", secondary: "#1e90ff",
+        font: "'Fira Code', monospace", bgType: "cyberGrid"
+    },
+    { 
+        name: "20. Obsidian Metallic [Skeuo]", 
+        morphism: "skeuomorphism",
+        head: "#f1f2f6", body: "#a4b0be", food: "#ff4757", accent: "#f1f2f6", secondary: "#0056b3",
+        font: "'Roboto Mono', monospace", bgType: "starfield"
+    }
+];
+
+/* --- PROCEDURAL BACKGROUND GENERATION --- */
+const starfieldStars = Array.from({ length: 60 }, () => ({
+    x: Math.random() * 600,
+    y: Math.random() * 600,
+    size: Math.random() * 2 + 1,
+    speed: Math.random() * 0.5 + 0.2
+}));
+
+const matrixDrops = Array.from({ length: 22 }, (_, i) => ({
+    x: i * CELL_SIZE,
+    y: Math.random() * 600,
+    speed: Math.random() * 3 + 2
+}));
+
+const bubbleOrbs = Array.from({ length: 12 }, () => ({
+    x: Math.random() * 600,
+    y: Math.random() * 600,
+    r: Math.random() * 30 + 15,
+    vx: (Math.random() - 0.5) * 1.5,
+    vy: (Math.random() - 0.5) * 1.5
+}));
+
+function drawProceduralBackground(type, accentColor) {
+    ctx.fillStyle = "#070a12";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    if (type === "cyberGrid") {
+        ctx.strokeStyle = accentColor + "22";
+        ctx.lineWidth = 1;
+        const offset = (animTime * 20) % CELL_SIZE;
+        for (let x = 0; x <= canvas.width; x += CELL_SIZE) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        }
+        for (let y = offset; y <= canvas.height; y += CELL_SIZE) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        }
+    } 
+    else if (type === "starfield") {
+        ctx.fillStyle = accentColor;
+        starfieldStars.forEach(s => {
+            s.y = (s.y + s.speed) % canvas.height;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    } 
+    else if (type === "waves") {
+        ctx.strokeStyle = accentColor + "33";
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 5; i++) {
+            ctx.beginPath();
+            for (let x = 0; x <= canvas.width; x += 10) {
+                const y = Math.sin((x * 0.01) + animTime + i) * 20 + (i * 120) + 60;
+                if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+        }
+    } 
+    else if (type === "matrixRain") {
+        ctx.fillStyle = accentColor + "aa";
+        ctx.font = "12px monospace";
+        matrixDrops.forEach(d => {
+            d.y = (d.y + d.speed) % canvas.height;
+            const char = String.fromCharCode(0x30A0 + Math.floor(Math.random() * 96));
+            ctx.fillText(char, d.x + 4, d.y);
+        });
+    } 
+    else if (type === "floatingBubbles") {
+        bubbleOrbs.forEach(b => {
+            b.x += b.vx; b.y += b.vy;
+            if (b.x < 0 || b.x > canvas.width) b.vx *= -1;
+            if (b.y < 0 || b.y > canvas.height) b.vy *= -1;
+
+            const grad = ctx.createRadialGradient(b.x, b.y, 2, b.x, b.y, b.r);
+            grad.addColorStop(0, accentColor + "44");
+            grad.addColorStop(1, "transparent");
+            ctx.fillStyle = grad;
+            ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill();
+        });
+    } 
+    else if (type === "radialPulse") {
+        const radius = (Math.sin(animTime * 2) * 80) + 200;
+        const grad = ctx.createRadialGradient(300, 300, 10, 300, 300, radius);
+        grad.addColorStop(0, accentColor + "33");
+        grad.addColorStop(1, "transparent");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+}
+
+function init() {
+    populateThemes();
+    updateUserDisplay();
+    loadLeaderboard();
+    applyTheme(19); // Default to Obsidian Metallic [Skeuo]
+    resetGame();
+    setupSwipeControls();
+    requestAnimationFrame(renderLoop);
+}
+
+function populateThemes() {
+    const select = document.getElementById('themeSelect');
+    select.innerHTML = '';
+    themes.forEach((t, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.innerText = t.name;
+        select.appendChild(opt);
+    });
+    select.value = 19;
+}
+
+function applyTheme(index) {
+    const selectedTheme = themes[index] || themes[19];
+    const root = document.documentElement;
+
+    activePrimaryColor = selectedTheme.accent;
+    activeSecondaryColor = selectedTheme.secondary || selectedTheme.body;
+    
+    root.style.setProperty('--accent', selectedTheme.accent);
+    root.style.setProperty('--accent-glow', selectedTheme.accent + '66');
+    root.style.setProperty('--theme-font', selectedTheme.font);
+
+    // Dynamic Morphism Styles
+    const m = selectedTheme.morphism;
+    if (m === "glass") {
+        root.style.setProperty('--card-bg', 'rgba(18, 25, 39, 0.55)');
+        root.style.setProperty('--card-border', '1px solid rgba(255, 255, 255, 0.18)');
+        root.style.setProperty('--card-shadow', '0 8px 32px 0 rgba(0, 0, 0, 0.5)');
+        root.style.setProperty('--card-backdrop', 'blur(16px)');
+        root.style.setProperty('--btn-bg', `linear-gradient(135deg, ${selectedTheme.accent}, ${activeSecondaryColor})`);
+        root.style.setProperty('--btn-shadow', `0 4px 15px ${selectedTheme.accent}66`);
+        root.style.setProperty('--btn-border', 'none');
+        root.style.setProperty('--btn-radius', '12px');
+    } else if (m === "neomorphism") {
+        root.style.setProperty('--card-bg', '#181e2a');
+        root.style.setProperty('--card-border', '1px solid #222a3a');
+        root.style.setProperty('--card-shadow', '10px 10px 20px #0e121a, -10px -10px 20px #222a3a');
+        root.style.setProperty('--card-backdrop', 'none');
+        root.style.setProperty('--btn-bg', '#181e2a');
+        root.style.setProperty('--btn-shadow', `5px 5px 10px #0e121a, -5px -5px 10px #222a3a`);
+        root.style.setProperty('--btn-border', `1px solid ${selectedTheme.accent}44`);
+        root.style.setProperty('--btn-radius', '14px');
+    } else if (m === "claymorphism") {
+        root.style.setProperty('--card-bg', '#222c40');
+        root.style.setProperty('--card-border', 'none');
+        root.style.setProperty('--card-shadow', '8px 8px 16px rgba(0,0,0,0.4), inset -6px -6px 12px rgba(0,0,0,0.3), inset 6px 6px 12px rgba(255,255,255,0.1)');
+        root.style.setProperty('--card-backdrop', 'none');
+        root.style.setProperty('--btn-bg', selectedTheme.accent);
+        root.style.setProperty('--btn-shadow', 'inset -4px -4px 8px rgba(0,0,0,0.4), inset 4px 4px 8px rgba(255,255,255,0.4), 0 8px 15px rgba(0,0,0,0.3)');
+        root.style.setProperty('--btn-border', 'none');
+        root.style.setProperty('--btn-radius', '20px');
+    } else if (m === "glowmorphism") {
+        root.style.setProperty('--card-bg', 'rgba(10, 15, 26, 0.85)');
+        root.style.setProperty('--card-border', `1px solid ${selectedTheme.accent}`);
+        root.style.setProperty('--card-shadow', `0 0 25px ${selectedTheme.accent}44, inset 0 0 15px ${selectedTheme.accent}22`);
+        root.style.setProperty('--card-backdrop', 'blur(10px)');
+        root.style.setProperty('--btn-bg', 'transparent');
+        root.style.setProperty('--btn-shadow', `0 0 15px ${selectedTheme.accent}`);
+        root.style.setProperty('--btn-border', `2px solid ${selectedTheme.accent}`);
+        root.style.setProperty('--btn-radius', '8px');
+    } else if (m === "skeuomorphism") {
+        root.style.setProperty('--card-bg', 'linear-gradient(180deg, #2c3545 0%, #1a212d 100%)');
+        root.style.setProperty('--card-border', '2px solid #45536b');
+        root.style.setProperty('--card-shadow', '0 10px 20px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.2)');
+        root.style.setProperty('--card-backdrop', 'none');
+        root.style.setProperty('--btn-bg', `linear-gradient(180deg, ${selectedTheme.accent} 0%, ${activeSecondaryColor} 100%)`);
+        root.style.setProperty('--btn-shadow', '0 5px 0 #003d80, 0 8px 10px rgba(0,0,0,0.5)');
+        root.style.setProperty('--btn-border', '1px solid rgba(255,255,255,0.4)');
+        root.style.setProperty('--btn-radius', '6px');
+    }
+}
+
+function resetGame() {
+    const startX = Math.floor(GRID_CELLS / 2);
+    const startY = Math.floor(GRID_CELLS / 2);
+    
+    snake = [
+        { x: startX, y: startY, prevX: startX - 1, prevY: startY },
+        { x: startX - 1, y: startY, prevX: startX - 2, prevY: startY },
+        { x: startX - 2, y: startY, prevX: startX - 3, prevY: startY },
+        { x: startX - 3, y: startY, prevX: startX - 4, prevY: startY }
+    ];
+    dirX = 1; dirY = 0;
+    nextDirX = 1; nextDirY = 0;
+    score = 0;
+    stepProgress = 0;
+    isPaused = false;
+    document.getElementById('currentScore').innerText = score;
+    document.getElementById('pauseBtn').innerText = "⏸ Pause Game";
+    document.getElementById('pauseOverlay').classList.add('hidden');
+    spawnFood();
+}
+
+function startGame() {
+    resetGame();
+    document.getElementById('gameOverlay').classList.add('hidden');
+    isRunning = true;
+    lastTickTime = performance.now();
+}
+
+function togglePause() {
+    if (!isRunning) return;
+    isPaused = !isPaused;
+    const pauseBtn = document.getElementById('pauseBtn');
+    const pauseOverlay = document.getElementById('pauseOverlay');
+
+    if (isPaused) {
+        pauseBtn.innerText = "▶ Resume Game";
+        pauseOverlay.classList.remove('hidden');
+    } else {
+        pauseBtn.innerText = "⏸ Pause Game";
+        pauseOverlay.classList.add('hidden');
+        lastTickTime = performance.now();
+    }
+}
+
+function renderLoop(timestamp) {
+    animTime += 0.015;
+
+    renderMainBackground();
+
+    if (isRunning && !isPaused) {
+        const tickRate = difficulties[currentDifficulty];
+        const elapsed = timestamp - lastTickTime;
+        stepProgress = elapsed / tickRate;
+
+        if (elapsed >= tickRate) {
+            updateLogic();
+            lastTickTime = timestamp;
+            stepProgress = 0;
+        }
+    }
+
+    updateParticles();
+    drawGameMap();
+    requestAnimationFrame(renderLoop);
+}
+
+function updateLogic() {
+    dirX = nextDirX; dirY = nextDirY;
+
+    const head = { ...snake[0] };
+    let newX = (head.x + dirX + GRID_CELLS) % GRID_CELLS;
+    let newY = (head.y + dirY + GRID_CELLS) % GRID_CELLS;
+
+    const newHead = { x: newX, y: newY, prevX: head.x, prevY: head.y };
+
+    if (checkCollision(newX, newY)) {
+        handleGameOver();
+        return;
+    }
+
+    snake.unshift(newHead);
+
+    for (let i = 1; i < snake.length; i++) {
+        snake[i].prevX = snake[i].x;
+        snake[i].prevY = snake[i].y;
+    }
+
+    if (newX === food.x && newY === food.y) {
+        score += 10;
+        document.getElementById('currentScore').innerText = score;
+        createFoodParticles(food.x * CELL_SIZE, food.y * CELL_SIZE);
+        spawnFood();
+    } else {
+        snake.pop();
+    }
+}
+
+function spawnFood() {
+    food = {
+        x: Math.floor(Math.random() * GRID_CELLS),
+        y: Math.floor(Math.random() * GRID_CELLS)
+    };
+    if (snake.some(s => s.x === food.x && s.y === food.y)) {
+        spawnFood();
+    }
+}
+
+function checkCollision(x, y) {
+    for (let i = 0; i < snake.length - 1; i++) {
+        if (snake[i].x === x && snake[i].y === y) return true;
+    }
+    return false;
+}
+
+function handleGameOver() {
+    isRunning = false;
+    saveScore(currentUser, score);
+    document.getElementById('overlayTitle').innerText = "GAME OVER";
+    document.getElementById('overlaySub').innerText = `Final Score: ${score}`;
+    document.getElementById('gameOverlay').classList.remove('hidden');
+}
+
+function drawGameMap() {
+    const activeIndex = document.getElementById('themeSelect').value || 19;
+    const theme = themes[activeIndex];
+
+    // 1. Procedural Canvas Background
+    drawProceduralBackground(theme.bgType, theme.accent);
+
+    // 2. Animated Soft Glowing Food
+    const foodX = food.x * CELL_SIZE + 2;
+    const foodY = food.y * CELL_SIZE + 2;
+    const foodSize = CELL_SIZE - 4;
+
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = theme.food;
+    ctx.fillStyle = theme.food;
+    drawRoundedRect(ctx, foodX, foodY, foodSize, foodSize, 8);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // 3. Snake Body with Soft, Cushy, Squishy Taper Animation
+    const totalSegments = snake.length;
+
+    for (let i = totalSegments - 1; i >= 0; i--) {
+        const seg = snake[i];
+
+        let drawX, drawY;
+        if (isRunning && !isPaused) {
+            let dx = seg.x - seg.prevX;
+            let dy = seg.y - seg.prevY;
+            if (Math.abs(dx) > 1) dx = dx > 0 ? -1 : 1;
+            if (Math.abs(dy) > 1) dy = dy > 0 ? -1 : 1;
+
+            drawX = (seg.prevX + dx * Math.min(stepProgress, 1)) * CELL_SIZE;
+            drawY = (seg.prevY + dy * Math.min(stepProgress, 1)) * CELL_SIZE;
+        } else {
+            drawX = seg.x * CELL_SIZE;
+            drawY = seg.y * CELL_SIZE;
+        }
+
+        // SOFT & CUSHY TAPER
+        let scale = 1.0;
+        if (i > 0) {
+            const taperProgress = i / (totalSegments - 1);
+            scale = 1.0 - (Math.pow(taperProgress, 1.2) * 0.28);
+        }
+
+        // Soft idle breathing pulse
+        const squishPulse = Math.sin(animTime * 3 - i * 0.4) * 0.025;
+        scale += squishPulse;
+
+        const basePadding = 1.2;
+        const fullSize = CELL_SIZE - basePadding * 2;
+        const boxSize = fullSize * scale;
+        const offset = (CELL_SIZE - boxSize) / 2;
+
+        const posX = drawX + offset;
+        const posY = drawY + offset;
+        
+        const cornerRadius = Math.max(6, boxSize * 0.35);
+
+        ctx.fillStyle = i === 0 ? theme.head : theme.body;
+        ctx.shadowBlur = i === 0 ? 12 : 0;
+        ctx.shadowColor = theme.head;
+
+        drawRoundedRect(ctx, posX, posY, boxSize, boxSize, cornerRadius);
+        ctx.fill();
+
+        // Highlight
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+        ctx.lineWidth = Math.max(1, 1.5 * scale);
+        ctx.stroke();
+
+        // Eyes on Head
+        if (i === 0) {
+            ctx.fillStyle = "#ffffff";
+            let eyeOffsetX = dirY * 4;
+            let eyeOffsetY = dirX * 4;
+            let centerX = drawX + CELL_SIZE / 2;
+            let centerY = drawY + CELL_SIZE / 2;
+            
+            ctx.beginPath();
+            ctx.arc(centerX + dirX * 4 + eyeOffsetX, centerY + dirY * 4 + eyeOffsetY, 2.5, 0, Math.PI * 2);
+            ctx.arc(centerX + dirX * 4 - eyeOffsetX, centerY + dirY * 4 - eyeOffsetY, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    // 4. Soft Particle Effects
+    particles.forEach(p => {
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+    });
+    ctx.globalAlpha = 1.0;
+}
+
+function drawRoundedRect(ctx, x, y, width, height, radius) {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
+}
+
+function createFoodParticles(x, y) {
+    const activeIndex = document.getElementById('themeSelect').value || 19;
+    const foodColor = themes[activeIndex].food;
+    for (let i = 0; i < 10; i++) {
+        particles.push({
+            x: x + CELL_SIZE / 2,
+            y: y + CELL_SIZE / 2,
+            vx: (Math.random() - 0.5) * 4,
+            vy: (Math.random() - 0.5) * 4,
+            size: Math.random() * 3 + 2,
+            color: foodColor,
+            alpha: 1
+        });
+    }
+}
+
+function updateParticles() {
+    for (let i = particles.length - 1; i >= 0; i--) {
+        let p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 0.03;
+        if (p.alpha <= 0) particles.splice(i, 1);
+    }
+}
+
+function setDirection(x, y) {
+    if (!isRunning || isPaused) return;
+    if (x !== 0 && dirX === 0) { nextDirX = x; nextDirY = 0; }
+    if (y !== 0 && dirY === 0) { nextDirX = 0; nextDirY = y; }
+}
+
+/* Touch & Swipe Controls for Mobile Devices */
+function setupSwipeControls() {
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    canvas.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    canvas.addEventListener('touchend', e => {
+        let touchEndX = e.changedTouches[0].screenX;
+        let touchEndY = e.changedTouches[0].screenY;
+        
+        let diffX = touchEndX - touchStartX;
+        let diffY = touchEndY - touchStartY;
+
+        if (Math.abs(diffX) > Math.abs(diffY)) {
+            if (diffX > 30) setDirection(1, 0);
+            else if (diffX < -30) setDirection(-1, 0);
+        } else {
+            if (diffY > 30) setDirection(0, 1);
+            else if (diffY < -30) setDirection(0, -1);
+        }
+    }, { passive: true });
+}
+
+window.addEventListener('keydown', e => {
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) e.preventDefault();
+    if (e.key === ' ' && !isRunning) startGame();
+    else if ((e.key === ' ' || e.key === 'p' || e.key === 'P') && isRunning) togglePause();
+    
+    if ((e.key === 'ArrowUp' || e.key === 'w')) setDirection(0, -1);
+    if ((e.key === 'ArrowDown' || e.key === 's')) setDirection(0, 1);
+    if ((e.key === 'ArrowLeft' || e.key === 'a')) setDirection(-1, 0);
+    if ((e.key === 'ArrowRight' || e.key === 'd')) setDirection(1, 0);
+});
+
+function changeDifficulty() {
+    currentDifficulty = document.getElementById('difficultySelect').value;
+    if (isRunning) startGame();
+}
+
+function updateUserDisplay() {
+    document.getElementById('userDisplayName').innerText = currentUser;
+}
+
+function toggleAuthModal() {
+    document.getElementById('authModal').classList.toggle('hidden');
+}
+
+function loginUser() {
+    const input = document.getElementById('usernameInput').value.trim();
+    if (input) {
+        currentUser = input;
+        localStorage.setItem('snake_user', currentUser);
+        updateUserDisplay();
+        toggleAuthModal();
+    }
+}
+
+function loginGuest() {
+    currentUser = 'Guest';
+    localStorage.setItem('snake_user', 'Guest');
+    updateUserDisplay();
+    toggleAuthModal();
+}
+
+function saveScore(user, score) {
+    let scores = JSON.parse(localStorage.getItem('snake_scores') || '[]');
+    scores.push({ user, score });
+    scores.sort((a, b) => b.score - a.score);
+    scores = scores.slice(0, 10);
+    localStorage.setItem('snake_scores', JSON.stringify(scores));
+    loadLeaderboard();
+}
+
+function loadLeaderboard() {
+    let scores = JSON.parse(localStorage.getItem('snake_scores') || '[]');
+    const body = document.getElementById('leaderboardBody');
+    body.innerHTML = '';
+    
+    if (scores.length > 0) {
+        document.getElementById('highScore').innerText = scores[0].score;
+    }
+
+    scores.forEach((s, idx) => {
+        body.innerHTML += `<tr><td>${idx + 1}</td><td>${s.user}</td><td>${s.score}</td></tr>`;
+    });
+}
+
+init();
+</script>
+</body>
+</html>
