@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RetroSnake Deluxe - Synchronized Themes Edition</title>
+    <title>RetroSnake Deluxe - Global Leaderboard Edition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=Cinzel:wght@700&family=Fira+Code:wght@700&family=Inter:wght@400;700;900&family=Montserrat:wght@800&family=Orbitron:wght@700;900&family=Press+Start+2P&family=Rajdhani:wght@700&family=Roboto+Mono:wght@700&family=VT323&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDKs for Global Real-Time Leaderboard -->
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
 
     <style>
         :root {
@@ -277,7 +281,7 @@
         <div class="logo">Snake Motion HD</div>
         <div class="stats-bar">
             <div class="stat-item">Score: <span id="currentScore">0</span></div>
-            <div class="stat-item">High: <span id="highScore">0</span></div>
+            <div class="stat-item">Global High: <span id="highScore">0</span></div>
         </div>
     </div>
 
@@ -343,7 +347,7 @@
     </div>
 
     <div class="card">
-        <div class="label">Top Players</div>
+        <div class="label">🌐 Global Top Players</div>
         <table class="leaderboard-table">
             <thead>
                 <tr>
@@ -352,7 +356,9 @@
                     <th>Score</th>
                 </tr>
             </thead>
-            <tbody id="leaderboardBody"></tbody>
+            <tbody id="leaderboardBody">
+                <tr><td colspan="3" style="text-align:center; color:#8b949e;">Connecting to global scores...</td></tr>
+            </tbody>
         </table>
     </div>
 
@@ -435,136 +441,82 @@ let currentDifficulty = 'medium';
 
 /* --- 20 Themes across 5 Design Morphisms --- */
 const themes = [
-    // --- CLAYMORPHISM ---
-    { 
-        name: "1. Lavender Dream [Clay]", 
-        morphism: "claymorphism",
-        head: "#a29bfe", body: "#6c5ce7", food: "#00cec9", accent: "#a29bfe", secondary: "#6c5ce7",
-        font: "'Cinzel', serif", bgType: "waves"
-    },
-    { 
-        name: "2. Candy Pop [Clay]", 
-        morphism: "claymorphism",
-        head: "#ff7675", body: "#d63031", food: "#fdcb6e", accent: "#ff7675", secondary: "#e84393",
-        font: "'Montserrat', sans-serif", bgType: "floatingBubbles"
-    },
-    { 
-        name: "3. Playful Mint [Clay]", 
-        morphism: "claymorphism",
-        head: "#55efc4", body: "#00b894", food: "#e84393", accent: "#55efc4", secondary: "#00b894",
-        font: "'Inter', sans-serif", bgType: "radialPulse"
-    },
-    { 
-        name: "4. Toybox Yellow [Clay]", 
-        morphism: "claymorphism",
-        head: "#ffeaa7", body: "#fdcb6e", food: "#0984e3", accent: "#ffeaa7", secondary: "#fd79a8",
-        font: "'Press Start 2P', cursive", bgType: "floatingBubbles"
-    },
-
-    // --- GLASSMORPHISM ---
-    { 
-        name: "5. Cyber Neon [Glass]", 
-        morphism: "glass",
-        head: "#00f2fe", body: "#0284c7", food: "#ff0844", accent: "#00f2fe", secondary: "#7928ca",
-        font: "'Orbitron', sans-serif", bgType: "cyberGrid"
-    },
-    { 
-        name: "6. Deep Ocean [Glass]", 
-        morphism: "glass",
-        head: "#38bdf8", body: "#0369a1", food: "#f43f5e", accent: "#38bdf8", secondary: "#0284c7",
-        font: "'Montserrat', sans-serif", bgType: "waves"
-    },
-    { 
-        name: "7. Cosmic Nebula [Glass]", 
-        morphism: "glass",
-        head: "#c084fc", body: "#7e22ce", food: "#facc15", accent: "#c084fc", secondary: "#3b82f6",
-        font: "'Chakra Petch', sans-serif", bgType: "starfield"
-    },
-    { 
-        name: "8. Cherry Sakura [Glass]", 
-        morphism: "glass",
-        head: "#f472b6", body: "#be185d", food: "#4ade80", accent: "#f472b6", secondary: "#fb7185",
-        font: "'Cinzel', serif", bgType: "floatingBubbles"
-    },
-
-    // --- NEOMORPHISM ---
-    { 
-        name: "9. Dark Mode Charcoal [Neo]", 
-        morphism: "neomorphism",
-        head: "#60a5fa", body: "#2563eb", food: "#f87171", accent: "#60a5fa", secondary: "#1d4ed8",
-        font: "'Inter', sans-serif", bgType: "radialPulse"
-    },
-    { 
-        name: "10. Soft Ice Blue [Neo]", 
-        morphism: "neomorphism",
-        head: "#38bdf8", body: "#0284c7", food: "#fb923c", accent: "#38bdf8", secondary: "#0369a1",
-        font: "'Roboto Mono', monospace", bgType: "waves"
-    },
-    { 
-        name: "11. Industrial Steel [Neo]", 
-        morphism: "neomorphism",
-        head: "#facc15", body: "#ca8a04", food: "#ef4444", accent: "#facc15", secondary: "#854d0e",
-        font: "'Rajdhani', sans-serif", bgType: "cyberGrid"
-    },
-    { 
-        name: "12. Emerald Luxury [Neo]", 
-        morphism: "neomorphism",
-        head: "#34d399", body: "#059669", food: "#fb7185", accent: "#34d399", secondary: "#047857",
-        font: "'Cinzel', serif", bgType: "radialPulse"
-    },
-
-    // --- CYBERPUNK GLOWMORPHISM ---
-    { 
-        name: "13. Neon Matrix [Glow]", 
-        morphism: "glowmorphism",
-        head: "#22c55e", body: "#15803d", food: "#facc15", accent: "#22c55e", secondary: "#16a34a",
-        font: "'VT323', monospace", bgType: "matrixRain"
-    },
-    { 
-        name: "14. Synthwave Sunset [Glow]", 
-        morphism: "glowmorphism",
-        head: "#ff007f", body: "#b5005b", food: "#00f2fe", accent: "#ff007f", secondary: "#7928ca",
-        font: "'Rajdhani', sans-serif", bgType: "cyberGrid"
-    },
-    { 
-        name: "15. Solar Flare [Glow]", 
-        morphism: "glowmorphism",
-        head: "#ff9f43", body: "#ee5253", food: "#feca57", accent: "#ff9f43", secondary: "#ee5253",
-        font: "'Chakra Petch', sans-serif", bgType: "radialPulse"
-    },
-    { 
-        name: "16. Overclock Violet [Glow]", 
-        morphism: "glowmorphism",
-        head: "#00d2d3", body: "#54a0ff", food: "#ff9ff3", accent: "#00d2d3", secondary: "#54a0ff",
-        font: "'Orbitron', sans-serif", bgType: "starfield"
-    },
-
-    // --- SKEUOMORPHISM ---
-    { 
-        name: "17. Classic Arcade CRT [Skeuo]", 
-        morphism: "skeuomorphism",
-        head: "#4cd137", body: "#44bd32", food: "#e1b12c", accent: "#4cd137", secondary: "#44bd32",
-        font: "'Press Start 2P', cursive", bgType: "cyberGrid"
-    },
-    { 
-        name: "18. Vintage Leather & Brass [Skeuo]", 
-        morphism: "skeuomorphism",
-        head: "#e1b12c", body: "#cd84f1", food: "#ff3838", accent: "#e1b12c", secondary: "#cd84f1",
-        font: "'Cinzel', serif", bgType: "radialPulse"
-    },
-    { 
-        name: "19. Blueprint Drafting [Skeuo]", 
-        morphism: "skeuomorphism",
-        head: "#70a1ff", body: "#1e90ff", food: "#ff6b81", accent: "#70a1ff", secondary: "#1e90ff",
-        font: "'Fira Code', monospace", bgType: "cyberGrid"
-    },
-    { 
-        name: "20. Obsidian Metallic [Skeuo]", 
-        morphism: "skeuomorphism",
-        head: "#f1f2f6", body: "#a4b0be", food: "#ff4757", accent: "#f1f2f6", secondary: "#0056b3",
-        font: "'Roboto Mono', monospace", bgType: "starfield"
-    }
+    { name: "1. Lavender Dream [Clay]", morphism: "claymorphism", head: "#a29bfe", body: "#6c5ce7", food: "#00cec9", accent: "#a29bfe", secondary: "#6c5ce7", font: "'Cinzel', serif", bgType: "waves" },
+    { name: "2. Candy Pop [Clay]", morphism: "claymorphism", head: "#ff7675", body: "#d63031", food: "#fdcb6e", accent: "#ff7675", secondary: "#e84393", font: "'Montserrat', sans-serif", bgType: "floatingBubbles" },
+    { name: "3. Playful Mint [Clay]", morphism: "claymorphism", head: "#55efc4", body: "#00b894", food: "#e84393", accent: "#55efc4", secondary: "#00b894", font: "'Inter', sans-serif", bgType: "radialPulse" },
+    { name: "4. Toybox Yellow [Clay]", morphism: "claymorphism", head: "#ffeaa7", body: "#fdcb6e", food: "#0984e3", accent: "#ffeaa7", secondary: "#fd79a8", font: "'Press Start 2P', cursive", bgType: "floatingBubbles" },
+    { name: "5. Cyber Neon [Glass]", morphism: "glass", head: "#00f2fe", body: "#0284c7", food: "#ff0844", accent: "#00f2fe", secondary: "#7928ca", font: "'Orbitron', sans-serif", bgType: "cyberGrid" },
+    { name: "6. Deep Ocean [Glass]", morphism: "glass", head: "#38bdf8", body: "#0369a1", food: "#f43f5e", accent: "#38bdf8", secondary: "#0284c7", font: "'Montserrat', sans-serif", bgType: "waves" },
+    { name: "7. Cosmic Nebula [Glass]", morphism: "glass", head: "#c084fc", body: "#7e22ce", food: "#facc15", accent: "#c084fc", secondary: "#3b82f6", font: "'Chakra Petch', sans-serif", bgType: "starfield" },
+    { name: "8. Cherry Sakura [Glass]", morphism: "glass", head: "#f472b6", body: "#be185d", food: "#4ade80", accent: "#f472b6", secondary: "#fb7185", font: "'Cinzel', serif", bgType: "floatingBubbles" },
+    { name: "9. Dark Mode Charcoal [Neo]", morphism: "neomorphism", head: "#60a5fa", body: "#2563eb", food: "#f87171", accent: "#60a5fa", secondary: "#1d4ed8", font: "'Inter', sans-serif", bgType: "radialPulse" },
+    { name: "10. Soft Ice Blue [Neo]", morphism: "neomorphism", head: "#38bdf8", body: "#0284c7", food: "#fb923c", accent: "#38bdf8", secondary: "#0369a1", font: "'Roboto Mono', monospace", bgType: "waves" },
+    { name: "11. Industrial Steel [Neo]", morphism: "neomorphism", head: "#facc15", body: "#ca8a04", food: "#ef4444", accent: "#facc15", secondary: "#854d0e", font: "'Rajdhani', sans-serif", bgType: "cyberGrid" },
+    { name: "12. Emerald Luxury [Neo]", morphism: "neomorphism", head: "#34d399", body: "#059669", food: "#fb7185", accent: "#34d399", secondary: "#047857", font: "'Cinzel', serif", bgType: "radialPulse" },
+    { name: "13. Neon Matrix [Glow]", morphism: "glowmorphism", head: "#22c55e", body: "#15803d", food: "#facc15", accent: "#22c55e", secondary: "#16a34a", font: "'VT323', monospace", bgType: "matrixRain" },
+    { name: "14. Synthwave Sunset [Glow]", morphism: "glowmorphism", head: "#ff007f", body: "#b5005b", food: "#00f2fe", accent: "#ff007f", secondary: "#7928ca", font: "'Rajdhani', sans-serif", bgType: "cyberGrid" },
+    { name: "15. Solar Flare [Glow]", morphism: "glowmorphism", head: "#ff9f43", body: "#ee5253", food: "#feca57", accent: "#ff9f43", secondary: "#ee5253", font: "'Chakra Petch', sans-serif", bgType: "radialPulse" },
+    { name: "16. Overclock Violet [Glow]", morphism: "glowmorphism", head: "#00d2d3", body: "#54a0ff", food: "#ff9ff3", accent: "#00d2d3", secondary: "#54a0ff", font: "'Orbitron', sans-serif", bgType: "starfield" },
+    { name: "17. Classic Arcade CRT [Skeuo]", morphism: "skeuomorphism", head: "#4cd137", body: "#44bd32", food: "#e1b12c", accent: "#4cd137", secondary: "#44bd32", font: "'Press Start 2P', cursive", bgType: "cyberGrid" },
+    { name: "18. Vintage Leather & Brass [Skeuo]", morphism: "skeuomorphism", head: "#e1b12c", body: "#cd84f1", food: "#ff3838", accent: "#e1b12c", secondary: "#cd84f1", font: "'Cinzel', serif", bgType: "radialPulse" },
+    { name: "19. Blueprint Drafting [Skeuo]", morphism: "skeuomorphism", head: "#70a1ff", body: "#1e90ff", food: "#ff6b81", accent: "#70a1ff", secondary: "#1e90ff", font: "'Fira Code', monospace", bgType: "cyberGrid" },
+    { name: "20. Obsidian Metallic [Skeuo]", morphism: "skeuomorphism", head: "#f1f2f6", body: "#a4b0be", food: "#ff4757", accent: "#f1f2f6", secondary: "#0056b3", font: "'Roboto Mono', monospace", bgType: "starfield" }
 ];
+
+/* --- FIREBASE GLOBAL LEADERBOARD CONFIGURATION --- */
+// REPLACE THE PLACEHOLDERS BELOW WITH YOUR FIREBASE PROJECT KEYS
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// Initialize Firebase Real-Time Database
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+function saveScore(user, score) {
+    if (score <= 0) return;
+    
+    db.collection('leaderboard').add({
+        user: user,
+        score: score,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(error => {
+        console.error("Error writing score to cloud database: ", error);
+    });
+}
+
+function loadLeaderboard() {
+    db.collection('leaderboard')
+      .orderBy('score', 'desc')
+      .limit(10)
+      .onSnapshot(snapshot => {
+          const body = document.getElementById('leaderboardBody');
+          body.innerHTML = '';
+          
+          let index = 1;
+          if (snapshot.empty) {
+              body.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#8b949e;">No high scores yet! Play a game to set one.</td></tr>`;
+              return;
+          }
+
+          snapshot.forEach(doc => {
+              const data = doc.data();
+              if (index === 1) {
+                  document.getElementById('highScore').innerText = data.score;
+              }
+              body.innerHTML += `<tr><td>${index}</td><td>${data.user}</td><td>${data.score}</td></tr>`;
+              index++;
+          });
+      }, error => {
+          console.error("Leaderboard real-time listener error: ", error);
+          document.getElementById('leaderboardBody').innerHTML = `<tr><td colspan="3" style="text-align:center; color:#ff4757;">Failed to load global scores. Check Firebase config.</td></tr>`;
+      });
+}
 
 /* --- PROCEDURAL BACKGROUND GENERATION --- */
 const starfieldStars = Array.from({ length: 60 }, () => ({
@@ -1071,29 +1023,6 @@ function loginGuest() {
     localStorage.setItem('snake_user', 'Guest');
     updateUserDisplay();
     toggleAuthModal();
-}
-
-function saveScore(user, score) {
-    let scores = JSON.parse(localStorage.getItem('snake_scores') || '[]');
-    scores.push({ user, score });
-    scores.sort((a, b) => b.score - a.score);
-    scores = scores.slice(0, 10);
-    localStorage.setItem('snake_scores', JSON.stringify(scores));
-    loadLeaderboard();
-}
-
-function loadLeaderboard() {
-    let scores = JSON.parse(localStorage.getItem('snake_scores') || '[]');
-    const body = document.getElementById('leaderboardBody');
-    body.innerHTML = '';
-    
-    if (scores.length > 0) {
-        document.getElementById('highScore').innerText = scores[0].score;
-    }
-
-    scores.forEach((s, idx) => {
-        body.innerHTML += `<tr><td>${idx + 1}</td><td>${s.user}</td><td>${s.score}</td></tr>`;
-    });
 }
 
 init();
