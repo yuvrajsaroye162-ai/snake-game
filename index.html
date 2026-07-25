@@ -53,7 +53,6 @@
             position: relative;
         }
 
-        /* Animated Ambient Background Canvas */
         #bgCanvas {
             position: fixed;
             top: 0;
@@ -75,7 +74,6 @@
             z-index: 1;
         }
 
-        /* Dynamic Morphism Card Base */
         .card {
             width: 100%;
             background: var(--card-bg);
@@ -281,7 +279,7 @@
         <div class="logo">Snake Motion HD</div>
         <div class="stats-bar">
             <div class="stat-item">Score: <span id="currentScore">0</span></div>
-            <div class="stat-item">Global High: <span id="highScore">0</span></div>
+            <div class="stat-item">High Score: <span id="highScore">0</span></div>
         </div>
     </div>
 
@@ -290,7 +288,7 @@
         
         <div id="gameOverlay" class="overlay">
             <h1 id="overlayTitle" style="font-size: clamp(1.6rem, 6vw, 2.2rem); text-shadow: 0 0 10px var(--accent-glow);">READY PLAYER ONE</h1>
-            <p id="overlaySub" style="color: #8b949e; font-size: 0.9rem;">Soft Cushy Snake • Obsidian Metallic</p>
+            <p id="overlaySub" style="color: #8b949e; font-size: 0.9rem;">Soft Cushy Snake • Motion Blur Edition</p>
             <button class="btn" onclick="startGame()">Start Game</button>
         </div>
 
@@ -310,7 +308,6 @@
         </div>
     </div>
 
-    <!-- PAUSE & ON-SCREEN CONTROLS -->
     <div class="card">
         <button id="pauseBtn" class="btn btn-pause" onclick="togglePause()">⏸ Pause Game</button>
 
@@ -347,7 +344,7 @@
     </div>
 
     <div class="card">
-        <div class="label">🌐 Global Top Players</div>
+        <div class="label">🌐 Top Players</div>
         <table class="leaderboard-table">
             <thead>
                 <tr>
@@ -357,7 +354,7 @@
                 </tr>
             </thead>
             <tbody id="leaderboardBody">
-                <tr><td colspan="3" style="text-align:center; color:#8b949e;">Connecting to global scores...</td></tr>
+                <tr><td colspan="3" style="text-align:center; color:#8b949e;">Loading scores...</td></tr>
             </tbody>
         </table>
     </div>
@@ -415,7 +412,6 @@ function renderMainBackground() {
     });
 }
 
-
 /* --- GAME ENGINE & PROCEDURAL MAP THEMES --- */
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -427,6 +423,7 @@ let snake = [];
 let food = { x: 0, y: 0 };
 let dirX = 1, dirY = 0;
 let nextDirX = 1, nextDirY = 0;
+let inputQueue = [];
 let score = 0;
 let lastTickTime = 0;
 let stepProgress = 0; 
@@ -439,7 +436,6 @@ let currentUser = localStorage.getItem('snake_user') || 'Guest';
 let difficulties = { easy: 140, medium: 95, hard: 60 };
 let currentDifficulty = 'medium';
 
-/* --- 20 Themes across 5 Design Morphisms --- */
 const themes = [
     { name: "1. Lavender Dream [Clay]", morphism: "claymorphism", head: "#a29bfe", body: "#6c5ce7", food: "#00cec9", accent: "#a29bfe", secondary: "#6c5ce7", font: "'Cinzel', serif", bgType: "waves" },
     { name: "2. Candy Pop [Clay]", morphism: "claymorphism", head: "#ff7675", body: "#d63031", food: "#fdcb6e", accent: "#ff7675", secondary: "#e84393", font: "'Montserrat', sans-serif", bgType: "floatingBubbles" },
@@ -463,8 +459,10 @@ const themes = [
     { name: "20. Obsidian Metallic [Skeuo]", morphism: "skeuomorphism", head: "#f1f2f6", body: "#a4b0be", food: "#ff4757", accent: "#f1f2f6", secondary: "#0056b3", font: "'Roboto Mono', monospace", bgType: "starfield" }
 ];
 
-/* --- FIREBASE GLOBAL LEADERBOARD CONFIGURATION --- */
-// REPLACE THE PLACEHOLDERS BELOW WITH YOUR FIREBASE PROJECT KEYS
+/* --- FIREBASE WITH LOCAL FALLBACK --- */
+let db = null;
+let firebaseActive = false;
+
 const firebaseConfig = {
     apiKey: "YOUR_API_KEY",
     authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -474,48 +472,83 @@ const firebaseConfig = {
     appId: "YOUR_APP_ID"
 };
 
-// Initialize Firebase Real-Time Database
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+try {
+    if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        firebaseActive = true;
+    }
+} catch (e) {
+    console.warn("Firebase initialization skipped, using local persistence.");
+}
 
 function saveScore(user, score) {
     if (score <= 0) return;
     
-    db.collection('leaderboard').add({
-        user: user,
-        score: score,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }).catch(error => {
-        console.error("Error writing score to cloud database: ", error);
-    });
+    const localHigh = parseInt(localStorage.getItem('snake_high_score') || '0', 10);
+    if (score > localHigh) {
+        localStorage.setItem('snake_high_score', score);
+    }
+
+    if (firebaseActive && db) {
+        db.collection('leaderboard').add({
+            user: user,
+            score: score,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(err => console.warn("Cloud save failed", err));
+    } else {
+        loadLocalLeaderboard(user, score);
+    }
 }
 
 function loadLeaderboard() {
-    db.collection('leaderboard')
-      .orderBy('score', 'desc')
-      .limit(10)
-      .onSnapshot(snapshot => {
-          const body = document.getElementById('leaderboardBody');
-          body.innerHTML = '';
-          
-          let index = 1;
-          if (snapshot.empty) {
-              body.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#8b949e;">No high scores yet! Play a game to set one.</td></tr>`;
-              return;
-          }
-
-          snapshot.forEach(doc => {
-              const data = doc.data();
-              if (index === 1) {
-                  document.getElementById('highScore').innerText = data.score;
+    if (firebaseActive && db) {
+        db.collection('leaderboard')
+          .orderBy('score', 'desc')
+          .limit(10)
+          .onSnapshot(snapshot => {
+              const body = document.getElementById('leaderboardBody');
+              body.innerHTML = '';
+              let index = 1;
+              if (snapshot.empty) {
+                  body.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#8b949e;">No high scores yet!</td></tr>`;
+                  return;
               }
-              body.innerHTML += `<tr><td>${index}</td><td>${data.user}</td><td>${data.score}</td></tr>`;
-              index++;
-          });
-      }, error => {
-          console.error("Leaderboard real-time listener error: ", error);
-          document.getElementById('leaderboardBody').innerHTML = `<tr><td colspan="3" style="text-align:center; color:#ff4757;">Failed to load global scores. Check Firebase config.</td></tr>`;
-      });
+              snapshot.forEach(doc => {
+                  const data = doc.data();
+                  if (index === 1) document.getElementById('highScore').innerText = data.score;
+                  body.innerHTML += `<tr><td>${index}</td><td>${data.user}</td><td>${data.score}</td></tr>`;
+                  index++;
+              });
+          }, () => loadLocalLeaderboard());
+    } else {
+        loadLocalLeaderboard();
+    }
+}
+
+function loadLocalLeaderboard(currentUser, newScore) {
+    let localScores = JSON.parse(localStorage.getItem('snake_scores') || '[]');
+    if (currentUser && newScore) {
+        localScores.push({ user: currentUser, score: newScore });
+        localScores.sort((a, b) => b.score - a.score);
+        localScores = localScores.slice(0, 10);
+        localStorage.setItem('snake_scores', JSON.stringify(localScores));
+    }
+    
+    const body = document.getElementById('leaderboardBody');
+    body.innerHTML = '';
+    
+    if (localScores.length === 0) {
+        const topScore = localStorage.getItem('snake_high_score') || 0;
+        document.getElementById('highScore').innerText = topScore;
+        body.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#8b949e;">No high scores stored yet!</td></tr>`;
+        return;
+    }
+
+    document.getElementById('highScore').innerText = localScores[0].score;
+    localScores.forEach((item, idx) => {
+        body.innerHTML += `<tr><td>${idx + 1}</td><td>${item.user}</td><td>${item.score}</td></tr>`;
+    });
 }
 
 /* --- PROCEDURAL BACKGROUND GENERATION --- */
@@ -612,7 +645,7 @@ function init() {
     populateThemes();
     updateUserDisplay();
     loadLeaderboard();
-    applyTheme(19); // Default to Obsidian Metallic [Skeuo]
+    applyTheme(19);
     resetGame();
     setupSwipeControls();
     requestAnimationFrame(renderLoop);
@@ -641,7 +674,6 @@ function applyTheme(index) {
     root.style.setProperty('--accent-glow', selectedTheme.accent + '66');
     root.style.setProperty('--theme-font', selectedTheme.font);
 
-    // Dynamic Morphism Styles
     const m = selectedTheme.morphism;
     if (m === "glass") {
         root.style.setProperty('--card-bg', 'rgba(18, 25, 39, 0.55)');
@@ -703,6 +735,7 @@ function resetGame() {
     ];
     dirX = 1; dirY = 0;
     nextDirX = 1; nextDirY = 0;
+    inputQueue = [];
     score = 0;
     stepProgress = 0;
     isPaused = false;
@@ -758,7 +791,11 @@ function renderLoop(timestamp) {
 }
 
 function updateLogic() {
-    dirX = nextDirX; dirY = nextDirY;
+    if (inputQueue.length > 0) {
+        const nextMove = inputQueue.shift();
+        dirX = nextMove.x;
+        dirY = nextMove.y;
+    }
 
     const head = { ...snake[0] };
     let newX = (head.x + dirX + GRID_CELLS) % GRID_CELLS;
@@ -817,10 +854,8 @@ function drawGameMap() {
     const activeIndex = document.getElementById('themeSelect').value || 19;
     const theme = themes[activeIndex];
 
-    // 1. Procedural Canvas Background
     drawProceduralBackground(theme.bgType, theme.accent);
 
-    // 2. Animated Soft Glowing Food
     const foodX = food.x * CELL_SIZE + 2;
     const foodY = food.y * CELL_SIZE + 2;
     const foodSize = CELL_SIZE - 4;
@@ -832,9 +867,49 @@ function drawGameMap() {
     ctx.fill();
     ctx.shadowBlur = 0;
 
-    // 3. Snake Body with Soft, Cushy, Squishy Taper Animation
     const totalSegments = snake.length;
 
+    // --- MOTION BLUR CALCULATION & RENDERING ---
+    if (isRunning && !isPaused) {
+        const blurSteps = currentDifficulty === 'hard' ? 4 : 3;
+        const blurStrength = currentDifficulty === 'hard' ? 0.35 : 0.25;
+
+        for (let b = blurSteps; b >= 1; b--) {
+            const blurAlpha = (1 - (b / (blurSteps + 1))) * blurStrength;
+            const blurOffsetRatio = (b / blurSteps) * 0.4;
+
+            for (let i = 0; i < totalSegments; i++) {
+                const seg = snake[i];
+                let dx = seg.x - seg.prevX;
+                let dy = seg.y - seg.prevY;
+                if (Math.abs(dx) > 1) dx = dx > 0 ? -1 : 1;
+                if (Math.abs(dy) > 1) dy = dy > 0 ? -1 : 1;
+
+                let drawX = (seg.prevX + dx * Math.min(stepProgress, 1) - dx * blurOffsetRatio) * CELL_SIZE;
+                let drawY = (seg.prevY + dy * Math.min(stepProgress, 1) - dy * blurOffsetRatio) * CELL_SIZE;
+
+                let scale = 1.0;
+                if (i > 0) {
+                    const taperProgress = i / (totalSegments - 1);
+                    scale = 1.0 - (Math.pow(taperProgress, 1.2) * 0.28);
+                }
+
+                const basePadding = 1.2;
+                const fullSize = CELL_SIZE - basePadding * 2;
+                const boxSize = fullSize * scale;
+                const offset = (CELL_SIZE - boxSize) / 2;
+
+                ctx.save();
+                ctx.globalAlpha = blurAlpha;
+                ctx.fillStyle = i === 0 ? theme.head : theme.body;
+                drawRoundedRect(ctx, drawX + offset, drawY + offset, boxSize, boxSize, Math.max(6, boxSize * 0.35));
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+    }
+
+    // --- MAIN SNAKE BODY RENDER ---
     for (let i = totalSegments - 1; i >= 0; i--) {
         const seg = snake[i];
 
@@ -852,14 +927,12 @@ function drawGameMap() {
             drawY = seg.y * CELL_SIZE;
         }
 
-        // SOFT & CUSHY TAPER
         let scale = 1.0;
         if (i > 0) {
             const taperProgress = i / (totalSegments - 1);
             scale = 1.0 - (Math.pow(taperProgress, 1.2) * 0.28);
         }
 
-        // Soft idle breathing pulse
         const squishPulse = Math.sin(animTime * 3 - i * 0.4) * 0.025;
         scale += squishPulse;
 
@@ -880,12 +953,10 @@ function drawGameMap() {
         drawRoundedRect(ctx, posX, posY, boxSize, boxSize, cornerRadius);
         ctx.fill();
 
-        // Highlight
         ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
         ctx.lineWidth = Math.max(1, 1.5 * scale);
         ctx.stroke();
 
-        // Eyes on Head
         if (i === 0) {
             ctx.fillStyle = "#ffffff";
             let eyeOffsetX = dirY * 4;
@@ -900,7 +971,6 @@ function drawGameMap() {
         }
     }
 
-    // 4. Soft Particle Effects
     particles.forEach(p => {
         ctx.fillStyle = p.color;
         ctx.globalAlpha = p.alpha;
@@ -953,11 +1023,17 @@ function updateParticles() {
 
 function setDirection(x, y) {
     if (!isRunning || isPaused) return;
-    if (x !== 0 && dirX === 0) { nextDirX = x; nextDirY = 0; }
-    if (y !== 0 && dirY === 0) { nextDirX = 0; nextDirY = y; }
+
+    const lastDir = inputQueue.length > 0 ? inputQueue[inputQueue.length - 1] : { x: dirX, y: dirY };
+
+    if (x !== 0 && lastDir.x === 0) {
+        if (inputQueue.length < 2) inputQueue.push({ x: x, y: 0 });
+    }
+    if (y !== 0 && lastDir.y === 0) {
+        if (inputQueue.length < 2) inputQueue.push({ x: 0, y: y });
+    }
 }
 
-/* Touch & Swipe Controls for Mobile Devices */
 function setupSwipeControls() {
     let touchStartX = 0;
     let touchStartY = 0;
@@ -989,10 +1065,10 @@ window.addEventListener('keydown', e => {
     if (e.key === ' ' && !isRunning) startGame();
     else if ((e.key === ' ' || e.key === 'p' || e.key === 'P') && isRunning) togglePause();
     
-    if ((e.key === 'ArrowUp' || e.key === 'w')) setDirection(0, -1);
-    if ((e.key === 'ArrowDown' || e.key === 's')) setDirection(0, 1);
-    if ((e.key === 'ArrowLeft' || e.key === 'a')) setDirection(-1, 0);
-    if ((e.key === 'ArrowRight' || e.key === 'd')) setDirection(1, 0);
+    if ((e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W')) setDirection(0, -1);
+    if ((e.key === 'ArrowDown' || e.key === 's' || e.key === 'S')) setDirection(0, 1);
+    if ((e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A')) setDirection(-1, 0);
+    if ((e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D')) setDirection(1, 0);
 });
 
 function changeDifficulty() {
