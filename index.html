@@ -311,7 +311,10 @@
     </div>
 
     <div class="card">
-        <button id="pauseBtn" class="btn btn-pause" onclick="togglePause()">⏸ Pause Game</button>
+        <div style="display: flex; gap: 10px;">
+            <button id="pauseBtn" class="btn btn-pause" style="flex: 1;" onclick="togglePause()">⏸ Pause Game</button>
+            <button id="musicToggleBtn" class="btn btn-secondary btn-pause" style="flex: 0 0 55px; padding: 14px 0;" onclick="toggleMusic()" title="Toggle Music">🎵</button>
+        </div>
 
         <div class="label" style="text-align: center; margin-top: 4px;">Controls</div>
         <div class="dpad-container">
@@ -343,10 +346,20 @@
             <label class="label" for="themeSelect">Theme & Morphism Style</label>
             <select id="themeSelect" class="select-input" onchange="applyTheme(this.value)"></select>
         </div>
+
+        <div class="control-group">
+            <label class="label" for="musicSelect">🎧 Soundtrack</label>
+            <select id="musicSelect" class="select-input" onchange="changeMusicTrack()"></select>
+        </div>
+
+        <div class="control-group">
+            <label class="label" for="musicVolume">Music Volume</label>
+            <input type="range" id="musicVolume" min="0" max="100" value="50" oninput="changeMusicVolume(this.value)" style="width: 100%;">
+        </div>
     </div>
 
     <div class="card">
-        <div class="label">🌐 Top Players</div>
+        <div class="label" id="leaderboardLabel">🌐 Top Players</div>
         <table class="leaderboard-table">
             <thead>
                 <tr>
@@ -359,6 +372,9 @@
                 <tr><td colspan="3" style="text-align:center; color:#8b949e;">Loading scores...</td></tr>
             </tbody>
         </table>
+        <div id="leaderboardNote" class="hidden" style="font-size: 0.75rem; color: #8b949e; text-align: center; line-height: 1.4;">
+            Showing scores saved on this device only. 
+        </div>
     </div>
 
 </div>
@@ -420,6 +436,149 @@ function playSound(type) {
         osc.start(now);
         osc.stop(now + 0.35);
     }
+}
+
+/* --- PROCEDURAL BACKGROUND SOUNDTRACK ENGINE --- */
+const NOTE_FREQS = {
+    C3: 130.81, D3: 146.83, E3: 164.81, F3: 174.61, G3: 196.00, A3: 220.00, B3: 246.94,
+    C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.00, A4: 440.00, B4: 493.88,
+    C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, R: 0
+};
+
+const musicTracks = {
+    arcade: {
+        name: "🕹️ Retro Arcade", tempo: 138, stepBeats: 0.5,
+        bass: ['C3','R','C3','R','G3','R','G3','R','A3','R','A3','R','F3','R','G3','R'],
+        lead: ['C4','E4','G4','E4','C4','E4','G4','C5','A4','C5','A4','G4','F4','A4','G4','E4']
+    },
+    synth: {
+        name: "🌆 Neon Drift", tempo: 108, stepBeats: 0.5,
+        bass: ['A3','R','A3','R','F3','R','F3','R','C3','R','C3','R','G3','R','E3','R'],
+        lead: ['E4','R','C4','E4','R','C4','A3','R','F4','R','A4','R','G4','R','E4','R']
+    },
+    chill: {
+        name: "☁️ Chill Bytes", tempo: 82, stepBeats: 0.5,
+        bass: ['C3','R','R','R','G3','R','R','R','A3','R','R','R','F3','R','R','R'],
+        lead: ['R','R','E4','R','R','R','D4','R','R','R','C4','R','R','G4','R','R']
+    },
+    boss: {
+        name: "🔥 Boss Rush", tempo: 160, stepBeats: 0.5,
+        bass: ['E3','R','E3','R','D3','R','D3','R','C3','R','C3','R','B3','R','B3','R'],
+        lead: ['E4','G4','B4','G4','D4','F4','A4','F4','C4','E4','G4','E4','B3','D4','F4','D4']
+    }
+};
+
+let musicEnabled = localStorage.getItem('snake_music_enabled') !== 'false';
+let currentTrack = localStorage.getItem('snake_music_track') || 'arcade';
+let musicVolume = parseFloat(localStorage.getItem('snake_music_volume') || '50');
+let musicGain = null;
+let stepIndex = 0;
+let nextNoteTime = 0;
+let schedulerTimer = null;
+const SCHEDULE_AHEAD = 0.15;
+const LOOKAHEAD_MS = 25;
+
+function initMusicGain() {
+    if (!audioCtx || musicGain) return;
+    musicGain = audioCtx.createGain();
+    musicGain.gain.value = (musicVolume / 100) * 0.35;
+    musicGain.connect(audioCtx.destination);
+}
+
+function playMusicNote(freq, startTime, duration, type, peak) {
+    if (!freq) return;
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    osc.connect(g);
+    g.connect(musicGain);
+    g.gain.setValueAtTime(0.0001, startTime);
+    g.gain.linearRampToValueAtTime(peak, startTime + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+    osc.start(startTime);
+    osc.stop(startTime + duration + 0.02);
+}
+
+function scheduler() {
+    const track = musicTracks[currentTrack] || musicTracks.arcade;
+    const stepTime = (60 / track.tempo) * track.stepBeats;
+
+    while (nextNoteTime < audioCtx.currentTime + SCHEDULE_AHEAD) {
+        const step = stepIndex % track.bass.length;
+        const bassNote = track.bass[step];
+        const leadNote = track.lead[step];
+
+        if (bassNote !== 'R') playMusicNote(NOTE_FREQS[bassNote], nextNoteTime, stepTime * 0.9, 'triangle', 0.22);
+        if (leadNote !== 'R') playMusicNote(NOTE_FREQS[leadNote], nextNoteTime, stepTime * 0.75, 'square', 0.13);
+
+        nextNoteTime += stepTime;
+        stepIndex++;
+    }
+    schedulerTimer = setTimeout(scheduler, LOOKAHEAD_MS);
+}
+
+function startScheduler() {
+    if (!audioCtx || schedulerTimer) return;
+    stepIndex = 0;
+    nextNoteTime = audioCtx.currentTime + 0.05;
+    scheduler();
+}
+
+function stopScheduler() {
+    if (schedulerTimer) {
+        clearTimeout(schedulerTimer);
+        schedulerTimer = null;
+    }
+}
+
+function shouldMusicPlay() {
+    return musicEnabled && !(isRunning && isPaused);
+}
+
+function refreshMusicState() {
+    if (!audioCtx) return;
+    if (shouldMusicPlay()) {
+        startScheduler();
+    } else {
+        stopScheduler();
+    }
+}
+
+function toggleMusic() {
+    initAudio();
+    initMusicGain();
+    musicEnabled = !musicEnabled;
+    localStorage.setItem('snake_music_enabled', musicEnabled);
+    document.getElementById('musicToggleBtn').innerText = musicEnabled ? '🎵' : '🔇';
+    refreshMusicState();
+}
+
+function changeMusicTrack() {
+    currentTrack = document.getElementById('musicSelect').value;
+    localStorage.setItem('snake_music_track', currentTrack);
+    if (schedulerTimer) {
+        stopScheduler();
+        startScheduler();
+    }
+}
+
+function changeMusicVolume(val) {
+    musicVolume = parseFloat(val);
+    localStorage.setItem('snake_music_volume', musicVolume);
+    if (musicGain) musicGain.gain.value = (musicVolume / 100) * 0.35;
+}
+
+function populateMusicTracks() {
+    const select = document.getElementById('musicSelect');
+    select.innerHTML = '';
+    Object.keys(musicTracks).forEach(key => {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.innerText = musicTracks[key].name;
+        select.appendChild(opt);
+    });
+    select.value = currentTrack;
 }
 
 /* --- DYNAMIC THEME-SENSITIVE BACKGROUND CANVAS --- */
@@ -523,7 +682,20 @@ const themes = [
     { name: "20. Obsidian Metallic [Skeuo]", morphism: "skeuomorphism", head: "#f1f2f6", body: "#a4b0be", food: "#ff4757", accent: "#f1f2f6", secondary: "#0056b3", font: "'Roboto Mono', monospace", bgType: "starfield" }
 ];
 
-/* --- FIREBASE WITH LOCAL FALLBACK --- */
+/* --- FIREBASE WITH LOCAL FALLBACK ---
+   To make the leaderboard truly WORLDWIDE (synced live across every player's
+   device, anywhere), you need your own free Firebase project:
+     1. Go to https://console.firebase.google.com and create a project (no cost
+        on the free "Spark" plan for this amount of traffic).
+     2. Enable "Firestore Database" (start in test mode, or lock it down with
+        rules that allow create + read on the "leaderboard" collection).
+     3. Project settings > General > "Your apps" > Web app > copy the config
+        object and paste its values into firebaseConfig below, replacing the
+        YOUR_... placeholders.
+   Until real credentials are added, the game automatically falls back to a
+   local, per-device leaderboard (stored in this browser's localStorage) so
+   the feature still works out of the box — it just won't be shared between
+   players until you connect Firebase. --- */
 let db = null;
 let firebaseActive = false;
 
@@ -544,7 +716,21 @@ try {
     }
 } catch (e) {
     console.warn("Firebase initialization skipped, using local persistence.");
+    firebaseActive = false;
 }
+
+function updateLeaderboardStatusUI() {
+    const label = document.getElementById('leaderboardLabel');
+    const note = document.getElementById('leaderboardNote');
+    if (firebaseActive) {
+        label.innerText = "🌐 Top Players (Worldwide)";
+        note.classList.add('hidden');
+    } else {
+        label.innerText = "📍 Top Players (This Device)";
+        note.classList.remove('hidden');
+    }
+}
+updateLeaderboardStatusUI();
 
 function saveScore(user, score) {
     if (score <= 0) return;
@@ -751,6 +937,9 @@ function drawFloatingTexts() {
 
 function init() {
     populateThemes();
+    populateMusicTracks();
+    document.getElementById('musicToggleBtn').innerText = musicEnabled ? '🎵' : '🔇';
+    document.getElementById('musicVolume').value = musicVolume;
     updateUserDisplay();
     loadLeaderboard();
     applyTheme(19);
@@ -857,16 +1046,19 @@ function resetGame() {
 
 function startGame() {
     initAudio();
+    initMusicGain();
     resetGame();
     document.getElementById('gameOverlay').classList.add('hidden');
     isRunning = true;
     lastTickTime = performance.now();
     triggerHaptic(25);
+    refreshMusicState();
 }
 
 function togglePause() {
     if (!isRunning) return;
     initAudio();
+    initMusicGain();
     isPaused = !isPaused;
     const pauseBtn = document.getElementById('pauseBtn');
     const pauseOverlay = document.getElementById('pauseOverlay');
@@ -879,6 +1071,7 @@ function togglePause() {
         pauseOverlay.classList.add('hidden');
         lastTickTime = performance.now();
     }
+    refreshMusicState();
 }
 
 function renderLoop(timestamp) {
