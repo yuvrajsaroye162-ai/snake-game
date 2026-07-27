@@ -190,13 +190,16 @@
 
         .dpad-container {
             display: grid;
-            /* Equal-fraction columns guarantee identical button widths regardless of
-               viewport size — this is what preserves muscle memory across devices. */
+            /* Equal-fraction columns AND rows guarantee identical button widths/heights
+               regardless of viewport size — this is what preserves muscle memory across
+               devices. A true 3x3 grid with empty corners forms the "+" cross shape:
+               Up sits top-center, Left/Right sit middle row, Down sits bottom-center,
+               and the center + four corners are blank spacers. */
             grid-template-columns: repeat(3, 1fr);
-            grid-auto-rows: 1fr;
+            grid-template-rows: repeat(3, 1fr);
             gap: 8px;
             width: 100%;
-            max-width: 280px;
+            max-width: 220px;
             margin: 0 auto;
             touch-action: manipulation; /* blocks double-tap-to-zoom / pinch on the pad */
         }
@@ -206,10 +209,13 @@
             border: 1px solid rgba(255, 255, 255, 0.15);
             color: var(--text);
             font-size: 1.4rem;
-            /* Fixed height (not min-height) so all four buttons stay pixel-identical
-               regardless of content, and satisfies the ~44px minimum touch target. */
-            height: 55px;
+            /* aspect-ratio (not a fixed height) keeps every button a perfect square that
+               tracks the grid column width, so all four stay pixel-identical to each
+               other on every screen size while satisfying the ~44px min touch target. */
+            aspect-ratio: 1 / 1;
             width: 100%;
+            height: auto;
+            min-height: 48px;
             padding: 0;
             border-radius: 14px;
             display: flex;
@@ -223,6 +229,15 @@
             -webkit-touch-callout: none; /* prevent iOS long-press callout/selection menu */
             outline: none;
             transition: background 0.06s ease, transform 0.06s ease;
+        }
+
+        .dpad-spacer {
+            /* Invisible placeholder that occupies a grid cell without rendering
+               anything, so the 3x3 grid keeps its shape without extra markup logic. */
+            aspect-ratio: 1 / 1;
+            width: 100%;
+            visibility: hidden;
+            pointer-events: none;
         }
 
         .dpad-btn:active,
@@ -281,7 +296,8 @@
         @media (max-width: 400px) {
             body { padding: 8px 5px; }
             .card { padding: 12px; gap: 10px; }
-            .dpad-btn { height: 48px; font-size: 1.2rem; }
+            .dpad-container { max-width: 190px; }
+            .dpad-btn { font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -332,12 +348,17 @@
 
         <div class="label" style="text-align: center; margin-top: 4px;">Controls</div>
         <div class="dpad-container" id="dpadContainer">
-            <div></div>
+            <div class="dpad-spacer"></div>
             <button class="dpad-btn" data-dx="0" data-dy="-1" aria-label="Up">▲</button>
-            <div></div>
+            <div class="dpad-spacer"></div>
+
             <button class="dpad-btn" data-dx="-1" data-dy="0" aria-label="Left">◄</button>
-            <button class="dpad-btn" data-dx="0" data-dy="1" aria-label="Down">▼</button>
+            <div class="dpad-spacer"></div>
             <button class="dpad-btn" data-dx="1" data-dy="0" aria-label="Right">►</button>
+
+            <div class="dpad-spacer"></div>
+            <button class="dpad-btn" data-dx="0" data-dy="1" aria-label="Down">▼</button>
+            <div class="dpad-spacer"></div>
         </div>
     </div>
 
