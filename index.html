@@ -11,7 +11,7 @@
     <!-- Firebase SDKs for Global Real-Time Leaderboard -->
     <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
-
+    <link rel="icon" href="logo.ico">
     <style>
         :root {
             --bg-color: #050811;
@@ -176,6 +176,11 @@
             gap: 8px;
         }
 
+        .btn a{
+            color: white;
+            text-decoration: none;
+        }
+
         .btn:active { transform: scale(0.95); }
 
         .btn-pause {
@@ -312,7 +317,7 @@
 <div class="single-column-app">
 
     <div class="card header">
-        <div class="logo">Snake Motion HD</div>
+        <div class="logo">SnakeOG</div>
         <div class="stats-bar">
             <div class="stat-item">Score: <span id="currentScore">0</span></div>
             <div class="stat-item">High Score: <span id="highScore">0</span></div>
@@ -394,6 +399,17 @@
         <div class="control-group">
             <label class="label" for="musicVolume">Music Volume</label>
             <input type="range" id="musicVolume" min="0" max="100" value="50" oninput="changeMusicVolume(this.value)" style="width: 100%;">
+        </div>
+        <div class="control-group">
+            <label class="label" for="musicVolume">Music Volume</label>
+            <button class="btn">
+
+                <a href="app-release.apk"
+                download
+                class="download-btn">
+                Download for Android
+            </button>
+</a>
         </div>
     </div>
 
