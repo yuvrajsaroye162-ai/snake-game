@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RetroSnake Deluxe - Fixed Loop Edition</title>
+    <title>SnakeOG Deluxe - Ultra Smooth Edition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=Cinzel:wght@700&family=Fira+Code:wght@700&family=Inter:wght@400;700;900&family=Montserrat:wght@800&family=Orbitron:wght@700;900&family=Press+Start+2P&family=Rajdhani:wght@700&family=Roboto+Mono:wght@700&family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Cinzel:wght@700&family=Fira+Code:wght@700&family=Inter:wght@400;600;800&family=Montserrat:wght@800&family=Orbitron:wght@700;900&family=Press+Start+2P&family=Rajdhani:wght@700&family=Roboto+Mono:wght@700&family=VT323&display=swap" rel="stylesheet">
 
     <!-- Firebase SDKs for Global Real-Time Leaderboard -->
     <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
@@ -14,20 +14,21 @@
     <link rel="icon" href="logo.ico">
     <style>
         :root {
-            --bg-color: #050811;
-            --card-bg: rgba(18, 25, 39, 0.65);
-            --card-border: 1px solid rgba(255, 255, 255, 0.12);
-            --card-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
-            --card-backdrop: blur(16px);
-            --accent: #f1f2f6;
-            --accent-glow: rgba(241, 242, 246, 0.4);
-            --secondary-accent: #0056b3;
+            --bg-color: #070913;
+            --card-bg: rgba(16, 22, 36, 0.7);
+            --card-border: 1px solid rgba(255, 255, 255, 0.1);
+            --card-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+            --card-backdrop: blur(20px);
+            --accent: #34d399;
+            --accent-glow: rgba(52, 211, 153, 0.35);
+            --secondary-accent: #059669;
             --text: #f0f6fc;
-            --theme-font: 'Roboto Mono', monospace;
-            --btn-bg: linear-gradient(180deg, #f1f2f6 0%, #0056b3 100%);
-            --btn-shadow: 0 5px 0 #003d80, 0 8px 10px rgba(0,0,0,0.5);
-            --btn-border: 1px solid rgba(255,255,255,0.4);
-            --btn-radius: 6px;
+            --text-muted: #8b949e;
+            --theme-font: 'Cinzel', serif;
+            --btn-bg: linear-gradient(135deg, var(--accent) 0%, var(--secondary-accent) 100%);
+            --btn-shadow: 0 4px 20px rgba(52, 211, 153, 0.3);
+            --btn-border: 1px solid rgba(255, 255, 255, 0.2);
+            --btn-radius: 12px;
         }
 
         * {
@@ -36,11 +37,11 @@
             padding: 0;
             font-family: var(--theme-font);
             user-select: none;
-            transition: font-family 0.3s ease, background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
+            transition: font-family 0.25s ease, background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
             -webkit-tap-highlight-color: transparent;
         }
 
-        html::-webkit-scrollbar{
+        html::-webkit-scrollbar {
             display: none;
         }
 
@@ -49,7 +50,7 @@
             color: var(--text);
             min-height: 100vh;
             min-height: 100dvh;
-            padding: 15px 10px;
+            padding: 20px 12px;
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -64,13 +65,13 @@
             width: 100vw;
             height: 100vh;
             z-index: -1;
-            filter: blur(40px);
+            filter: blur(50px);
             pointer-events: none;
         }
 
         .single-column-app {
             width: 100%;
-            max-width: 550px;
+            max-width: 520px;
             display: flex;
             flex-direction: column;
             gap: 16px;
@@ -85,41 +86,45 @@
             -webkit-backdrop-filter: var(--card-backdrop);
             border: var(--card-border);
             border-radius: 20px;
-            padding: 16px;
+            padding: 18px;
             box-shadow: var(--card-shadow);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
         }
 
         .header {
             text-align: center;
+            padding: 14px 18px;
         }
 
         .logo {
-            font-size: clamp(1.4rem, 5vw, 2rem);
+            font-size: clamp(1.5rem, 6vw, 2.2rem);
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            background: linear-gradient(45deg, var(--accent), #ffffff);
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, #ffffff 20%, var(--accent) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 15px var(--accent-glow);
+            text-shadow: 0 0 20px var(--accent-glow);
+            margin-bottom: 8px;
         }
 
         .stats-bar {
             display: flex;
             justify-content: space-around;
-            font-size: clamp(0.9rem, 3.5vw, 1.2rem);
+            font-size: clamp(0.85rem, 3.5vw, 1.05rem);
             font-weight: 700;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px 16px;
             border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            letter-spacing: 0.5px;
         }
 
         .stat-item span {
             color: var(--accent);
+            text-shadow: 0 0 10px var(--accent-glow);
         }
 
         .canvas-container {
@@ -137,22 +142,22 @@
             width: 100%;
             height: 100%;
             display: block;
-            background-color: #000;
+            background-color: #05070f;
         }
 
         .overlay {
             position: absolute;
             inset: 0;
-            background: rgba(7, 10, 18, 0.88);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(7, 10, 18, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 15px;
+            gap: 16px;
             z-index: 10;
-            padding: 20px;
+            padding: 24px;
             text-align: center;
         }
 
@@ -162,65 +167,66 @@
             background: var(--btn-bg);
             color: #fff;
             border: var(--btn-border);
-            padding: 12px 20px;
+            padding: 12px 22px;
             border-radius: var(--btn-radius);
             font-weight: 700;
             font-size: 0.95rem;
             cursor: pointer;
-            transition: transform 0.1s ease, filter 0.2s ease, box-shadow 0.2s ease;
+            transition: all 0.2s ease;
             box-shadow: var(--btn-shadow);
             text-align: center;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-        }
-
-        .btn a{
-            color: white;
             text-decoration: none;
+            letter-spacing: 0.5px;
         }
 
-        .btn:active { transform: scale(0.95); }
+        .btn:hover {
+            filter: brightness(1.15);
+            transform: translateY(-1px);
+        }
+
+        .btn:active { 
+            transform: translateY(1px) scale(0.97); 
+        }
 
         .btn-pause {
             width: 100%;
-            padding: 14px;
-            font-size: 1.1rem;
+            padding: 12px;
+            font-size: 0.95rem;
             letter-spacing: 1px;
             text-transform: uppercase;
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             box-shadow: none;
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
         }
 
         .dpad-container {
             display: grid;
-            /* Equal-fraction columns AND rows guarantee identical button widths/heights
-               regardless of viewport size — this is what preserves muscle memory across
-               devices. A true 3x3 grid with empty corners forms the "+" cross shape:
-               Up sits top-center, Left/Right sit middle row, Down sits bottom-center,
-               and the center + four corners are blank spacers. */
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            gap: 8px;
+            gap: 10px;
             width: 100%;
             max-width: 220px;
-            margin: 0 auto;
-            touch-action: manipulation; /* blocks double-tap-to-zoom / pinch on the pad */
+            margin: 4px auto 0 auto;
+            touch-action: manipulation;
         }
 
         .dpad-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             color: var(--text);
-            font-size: 1.4rem;
-            /* aspect-ratio (not a fixed height) keeps every button a perfect square that
-               tracks the grid column width, so all four stay pixel-identical to each
-               other on every screen size while satisfying the ~44px min touch target. */
+            font-size: 1.2rem;
             aspect-ratio: 1 / 1;
             width: 100%;
             height: auto;
@@ -231,18 +237,15 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: var(--btn-shadow);
             touch-action: manipulation;
-            -webkit-user-select: none;
             user-select: none;
-            -webkit-touch-callout: none; /* prevent iOS long-press callout/selection menu */
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
             outline: none;
-            transition: background 0.06s ease, transform 0.06s ease;
+            transition: background 0.1s ease, transform 0.1s ease, border-color 0.1s ease;
         }
 
         .dpad-spacer {
-            /* Invisible placeholder that occupies a grid cell without rendering
-               anything, so the 3x3 grid keeps its shape without extra markup logic. */
             aspect-ratio: 1 / 1;
             width: 100%;
             visibility: hidden;
@@ -252,8 +255,10 @@
         .dpad-btn:active,
         .dpad-btn.is-pressed {
             background: var(--accent);
-            color: #000;
-            transform: scale(0.93);
+            color: #05070f;
+            border-color: var(--accent);
+            transform: scale(0.92);
+            box-shadow: 0 0 15px var(--accent-glow);
         }
 
         .control-group {
@@ -263,22 +268,28 @@
         }
 
         .label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #8b949e;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            font-weight: 700;
         }
 
         .select-input, .text-input {
             width: 100%;
-            padding: 10px 12px;
+            padding: 12px 14px;
             background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             color: #fff;
             border-radius: 10px;
             outline: none;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        .select-input:focus, .text-input:focus {
+            border-color: var(--accent);
         }
 
         .user-row {
@@ -288,6 +299,7 @@
             background: rgba(0, 0, 0, 0.3);
             padding: 10px 14px;
             border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .leaderboard-table {
@@ -296,17 +308,54 @@
             font-size: 0.85rem;
         }
 
-        .leaderboard-table th, .leaderboard-table td {
+        .leaderboard-table th {
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.72rem;
+            letter-spacing: 1px;
             padding: 8px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .leaderboard-table td {
+            padding: 10px;
             text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -6px;
+            box-shadow: 0 0 10px var(--accent-glow);
         }
 
         @media (max-width: 400px) {
-            body { padding: 8px 5px; }
-            .card { padding: 12px; gap: 10px; }
+            body { padding: 12px 6px; }
+            .card { padding: 14px; gap: 10px; }
             .dpad-container { max-width: 190px; }
-            .dpad-btn { font-size: 1.2rem; }
+            .dpad-btn { font-size: 1.1rem; }
         }
     </style>
 </head>
@@ -328,14 +377,14 @@
         <canvas id="gameCanvas" width="600" height="600"></canvas>
         
         <div id="gameOverlay" class="overlay">
-            <h1 id="overlayTitle" style="font-size: clamp(1.6rem, 6vw, 2.2rem); text-shadow: 0 0 10px var(--accent-glow);">READY PLAYER ONE</h1>
-            <p id="overlaySub" style="color: #8b949e; font-size: 0.9rem;">Ultra Organic Snake • Real-time Dynamics</p>
+            <h1 id="overlayTitle" style="font-size: clamp(1.5rem, 5vw, 2.2rem); text-shadow: 0 0 15px var(--accent-glow);">READY PLAYER ONE</h1>
+            <p id="overlaySub" style="color: var(--text-muted); font-size: 0.85rem;">Butter-Smooth Interpolation Engine</p>
             <button class="btn" onclick="startGame()">Start Game</button>
         </div>
 
         <div id="pauseOverlay" class="overlay hidden">
-            <h1 style="font-size: 2.2rem; text-shadow: 0 0 10px var(--accent-glow);">GAME PAUSED</h1>
-            <p style="color: #8b949e; font-size: 0.9rem;">Take a breather...</p>
+            <h1 style="font-size: 2rem; text-shadow: 0 0 15px var(--accent-glow);">GAME PAUSED</h1>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Take a breather...</p>
             <button class="btn" onclick="togglePause()">Resume Game</button>
         </div>
 
@@ -352,7 +401,7 @@
     <div class="card">
         <div style="display: flex; gap: 10px;">
             <button id="pauseBtn" class="btn btn-pause" style="flex: 1;" onclick="togglePause()">⏸ Pause Game</button>
-            <button id="musicToggleBtn" class="btn btn-secondary btn-pause" style="flex: 0 0 55px; padding: 14px 0;" onclick="toggleMusic()" title="Toggle Music">🎵</button>
+            <button id="musicToggleBtn" class="btn btn-secondary btn-pause" style="flex: 0 0 52px; padding: 0;" onclick="toggleMusic()" title="Toggle Music">🎵</button>
         </div>
 
         <div class="label" style="text-align: center; margin-top: 4px;">Controls</div>
@@ -373,8 +422,8 @@
 
     <div class="card">
         <div class="user-row">
-            <span>Player: <strong id="userDisplayName">Guest</strong></span>
-            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="toggleAuthModal()">Switch User</button>
+            <span style="font-size: 0.9rem;">Player: <strong id="userDisplayName">Guest</strong></span>
+            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.78rem;" onclick="toggleAuthModal()">Switch User</button>
         </div>
 
         <div class="control-group">
@@ -387,7 +436,7 @@
         </div>
 
         <div class="control-group">
-            <label class="label" for="themeSelect">Theme & Morphism Style</label>
+            <label class="label" for="themeSelect">Theme Style</label>
             <select id="themeSelect" class="select-input" onchange="applyTheme(this.value)"></select>
         </div>
 
@@ -398,18 +447,13 @@
 
         <div class="control-group">
             <label class="label" for="musicVolume">Music Volume</label>
-            <input type="range" id="musicVolume" min="0" max="100" value="50" oninput="changeMusicVolume(this.value)" style="width: 100%;">
+            <input type="range" id="musicVolume" min="0" max="100" value="50" oninput="changeMusicVolume(this.value)">
         </div>
-        <div class="control-group">
-            <label class="label" for="musicVolume">Music Volume</label>
-            <button class="btn">
 
-                <a href="app-release.apk"
-                download
-                class="download-btn">
-                Download for Android
-            </button>
-</a>
+        <div class="control-group" style="margin-top: 4px;">
+            <a href="app-release.apk" download class="btn btn-secondary" style="width: 100%;">
+                📱 Download for Android
+            </a>
         </div>
     </div>
 
@@ -424,32 +468,28 @@
                 </tr>
             </thead>
             <tbody id="leaderboardBody">
-                <tr><td colspan="3" style="text-align:center; color:#8b949e;">Loading scores...</td></tr>
+                <tr><td colspan="3" style="text-align:center; color: var(--text-muted);">Loading scores...</td></tr>
             </tbody>
         </table>
-        <div id="leaderboardNote" class="hidden" style="font-size: 0.75rem; color: #8b949e; text-align: center; line-height: 1.4;">
-            Showing scores saved on this device only. 
+        <div id="leaderboardNote" class="hidden" style="font-size: 0.75rem; color: var(--text-muted); text-align: center; line-height: 1.4;">
+            Showing scores saved on this device only.
         </div>
     </div>
 
 </div>
 
 <script>
-/* --- WEB AUDIO SYNTHESIZER FOR SOUND FX --- */
+/* --- WEB AUDIO SYNTHESIZER --- */
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioCtx = null;
 
 function initAudio() {
-    if (!audioCtx) {
-        audioCtx = new AudioContext();
-    }
+    if (!audioCtx) audioCtx = new AudioContext();
 }
 
 function playSound(type) {
     if (!audioCtx) return;
-    if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
     
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
@@ -493,7 +533,7 @@ function playSound(type) {
     }
 }
 
-/* --- PROCEDURAL BACKGROUND SOUNDTRACK ENGINE --- */
+/* --- BACKGROUND MUSIC --- */
 const NOTE_FREQS = {
     C3: 130.81, D3: 146.83, E3: 164.81, F3: 174.61, G3: 196.00, A3: 220.00, B3: 246.94,
     C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.00, A4: 440.00, B4: 493.88,
@@ -501,26 +541,10 @@ const NOTE_FREQS = {
 };
 
 const musicTracks = {
-    arcade: {
-        name: "🕹️ Retro Arcade", tempo: 138, stepBeats: 0.5,
-        bass: ['C3','R','C3','R','G3','R','G3','R','A3','R','A3','R','F3','R','G3','R'],
-        lead: ['C4','E4','G4','E4','C4','E4','G4','C5','A4','C5','A4','G4','F4','A4','G4','E4']
-    },
-    synth: {
-        name: "🌆 Neon Drift", tempo: 108, stepBeats: 0.5,
-        bass: ['A3','R','A3','R','F3','R','F3','R','C3','R','C3','R','G3','R','E3','R'],
-        lead: ['E4','R','C4','E4','R','C4','A3','R','F4','R','A4','R','G4','R','E4','R']
-    },
-    chill: {
-        name: "☁️ Chill Bytes", tempo: 82, stepBeats: 0.5,
-        bass: ['C3','R','R','R','G3','R','R','R','A3','R','R','R','F3','R','R','R'],
-        lead: ['R','R','E4','R','R','R','D4','R','R','R','C4','R','R','G4','R','R']
-    },
-    boss: {
-        name: "🔥 Boss Rush", tempo: 160, stepBeats: 0.5,
-        bass: ['E3','R','E3','R','D3','R','D3','R','C3','R','C3','R','B3','R','B3','R'],
-        lead: ['E4','G4','B4','G4','D4','F4','A4','F4','C4','E4','G4','E4','B3','D4','F4','D4']
-    }
+    arcade: { name: "🕹️ Retro Arcade", tempo: 138, stepBeats: 0.5, bass: ['C3','R','C3','R','G3','R','G3','R','A3','R','A3','R','F3','R','G3','R'], lead: ['C4','E4','G4','E4','C4','E4','G4','C5','A4','C5','A4','G4','F4','A4','G4','E4'] },
+    synth: { name: "🌆 Neon Drift", tempo: 108, stepBeats: 0.5, bass: ['A3','R','A3','R','F3','R','F3','R','C3','R','C3','R','G3','R','E3','R'], lead: ['E4','R','C4','E4','R','C4','A3','R','F4','R','A4','R','G4','R','E4','R'] },
+    chill: { name: "☁️ Chill Bytes", tempo: 82, stepBeats: 0.5, bass: ['C3','R','R','R','G3','R','R','R','A3','R','R','R','F3','R','R','R'], lead: ['R','R','E4','R','R','R','D4','R','R','R','C4','R','R','G4','R','R'] },
+    boss: { name: "🔥 Boss Rush", tempo: 160, stepBeats: 0.5, bass: ['E3','R','E3','R','D3','R','D3','R','C3','R','C3','R','B3','R','B3','R'], lead: ['E4','G4','B4','G4','D4','F4','A4','F4','C4','E4','G4','E4','B3','D4','F4','D4'] }
 };
 
 let musicEnabled = localStorage.getItem('snake_music_enabled') !== 'false';
@@ -530,8 +554,6 @@ let musicGain = null;
 let stepIndex = 0;
 let nextNoteTime = 0;
 let schedulerTimer = null;
-const SCHEDULE_AHEAD = 0.15;
-const LOOKAHEAD_MS = 25;
 
 function initMusicGain() {
     if (!audioCtx || musicGain) return;
@@ -559,7 +581,7 @@ function scheduler() {
     const track = musicTracks[currentTrack] || musicTracks.arcade;
     const stepTime = (60 / track.tempo) * track.stepBeats;
 
-    while (nextNoteTime < audioCtx.currentTime + SCHEDULE_AHEAD) {
+    while (nextNoteTime < audioCtx.currentTime + 0.15) {
         const step = stepIndex % track.bass.length;
         const bassNote = track.bass[step];
         const leadNote = track.lead[step];
@@ -570,7 +592,7 @@ function scheduler() {
         nextNoteTime += stepTime;
         stepIndex++;
     }
-    schedulerTimer = setTimeout(scheduler, LOOKAHEAD_MS);
+    schedulerTimer = setTimeout(scheduler, 25);
 }
 
 function startScheduler() {
@@ -587,13 +609,9 @@ function stopScheduler() {
     }
 }
 
-function shouldMusicPlay() {
-    return musicEnabled && !(isRunning && isPaused);
-}
-
 function refreshMusicState() {
     if (!audioCtx) return;
-    if (shouldMusicPlay()) {
+    if (musicEnabled && !(isRunning && isPaused)) {
         startScheduler();
     } else {
         stopScheduler();
@@ -636,12 +654,12 @@ function populateMusicTracks() {
     select.value = currentTrack;
 }
 
-/* --- DYNAMIC THEME-SENSITIVE BACKGROUND CANVAS --- */
+/* --- DYNAMIC BACKGROUND CANVAS --- */
 const bgCanvas = document.getElementById('bgCanvas');
 const bgCtx = bgCanvas.getContext('2d');
 
-let activePrimaryColor = '#f1f2f6';
-let activeSecondaryColor = '#0056b3';
+let activePrimaryColor = '#34d399';
+let activeSecondaryColor = '#059669';
 
 function resizeBg() {
     bgCanvas.width = window.innerWidth;
@@ -650,20 +668,17 @@ function resizeBg() {
 window.addEventListener('resize', resizeBg);
 resizeBg();
 
-const bgOrbs = [];
-for (let i = 0; i < 8; i++) {
-    bgOrbs.push({
-        x: Math.random() * bgCanvas.width,
-        y: Math.random() * bgCanvas.height,
-        radius: Math.random() * 250 + 150,
-        vx: (Math.random() - 0.5) * 1.2,
-        vy: (Math.random() - 0.5) * 1.2,
-        useSecondary: i % 2 === 0
-    });
-}
+const bgOrbs = Array.from({ length: 8 }, (_, i) => ({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    radius: Math.random() * 250 + 150,
+    vx: (Math.random() - 0.5) * 1.2,
+    vy: (Math.random() - 0.5) * 1.2,
+    useSecondary: i % 2 === 0
+}));
 
 function renderMainBackground() {
-    bgCtx.fillStyle = '#050811';
+    bgCtx.fillStyle = '#070913';
     bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
 
     bgOrbs.forEach((orb) => {
@@ -676,7 +691,7 @@ function renderMainBackground() {
         const orbColor = orb.useSecondary ? activeSecondaryColor : activePrimaryColor;
 
         const grad = bgCtx.createRadialGradient(orb.x, orb.y, 10, orb.x, orb.y, orb.radius);
-        grad.addColorStop(0, orbColor + '55'); 
+        grad.addColorStop(0, orbColor + '44'); 
         grad.addColorStop(1, 'transparent');
 
         bgCtx.fillStyle = grad;
@@ -686,7 +701,7 @@ function renderMainBackground() {
     });
 }
 
-/* --- GAME ENGINE & PROCEDURAL MAP THEMES --- */
+/* --- ULTRA SMOOTH ENGINE --- */
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
@@ -709,24 +724,25 @@ let comboCount = 0;
 let lastEatTime = 0;
 let screenShakeTime = 0;
 let animTime = 0;
+let renderHeadAngle = 0;
 
 let currentUser = localStorage.getItem('snake_user') || 'Guest';
 let difficulties = { easy: 140, medium: 95, hard: 60 };
 let currentDifficulty = 'medium';
 
 const themes = [
-    { name: "1. Lavender Dream [Clay]", morphism: "claymorphism", head: "#a29bfe", body: "#6c5ce7", food: "#00cec9", accent: "#a29bfe", secondary: "#6c5ce7", font: "'Cinzel', serif", bgType: "waves" },
-    { name: "2. Candy Pop [Clay]", morphism: "claymorphism", head: "#ff7675", body: "#d63031", food: "#fdcb6e", accent: "#ff7675", secondary: "#e84393", font: "'Montserrat', sans-serif", bgType: "floatingBubbles" },
-    { name: "3. Playful Mint [Clay]", morphism: "claymorphism", head: "#55efc4", body: "#00b894", food: "#e84393", accent: "#55efc4", secondary: "#00b894", font: "'Inter', sans-serif", bgType: "radialPulse" },
-    { name: "4. Toybox Yellow [Clay]", morphism: "claymorphism", head: "#ffeaa7", body: "#fdcb6e", food: "#0984e3", accent: "#ffeaa7", secondary: "#fd79a8", font: "'Press Start 2P', cursive", bgType: "floatingBubbles" },
-    { name: "5. Cyber Neon [Glass]", morphism: "glass", head: "#00f2fe", body: "#0284c7", food: "#ff0844", accent: "#00f2fe", secondary: "#7928ca", font: "'Orbitron', sans-serif", bgType: "cyberGrid" },
-    { name: "6. Deep Ocean [Glass]", morphism: "glass", head: "#38bdf8", body: "#0369a1", food: "#f43f5e", accent: "#38bdf8", secondary: "#0284c7", font: "'Montserrat', sans-serif", bgType: "waves" },
-    { name: "7. Cosmic Nebula [Glass]", morphism: "glass", head: "#c084fc", body: "#7e22ce", food: "#facc15", accent: "#c084fc", secondary: "#3b82f6", font: "'Chakra Petch', sans-serif", bgType: "starfield" },
-    { name: "8. Cherry Sakura [Glass]", morphism: "glass", head: "#f472b6", body: "#be185d", food: "#4ade80", accent: "#f472b6", secondary: "#fb7185", font: "'Cinzel', serif", bgType: "floatingBubbles" },
-    { name: "9. Dark Mode Charcoal [Neo]", morphism: "neomorphism", head: "#60a5fa", body: "#2563eb", food: "#f87171", accent: "#60a5fa", secondary: "#1d4ed8", font: "'Inter', sans-serif", bgType: "radialPulse" },
-    { name: "10. Soft Ice Blue [Neo]", morphism: "neomorphism", head: "#38bdf8", body: "#0284c7", food: "#fb923c", accent: "#38bdf8", secondary: "#0369a1", font: "'Roboto Mono', monospace", bgType: "waves" },
-    { name: "11. Industrial Steel [Neo]", morphism: "neomorphism", head: "#facc15", body: "#ca8a04", food: "#ef4444", accent: "#facc15", secondary: "#854d0e", font: "'Rajdhani', sans-serif", bgType: "cyberGrid" },
-    { name: "12. Emerald Luxury [Neo]", morphism: "neomorphism", head: "#34d399", body: "#059669", food: "#fb7185", accent: "#34d399", secondary: "#047857", font: "'Cinzel', serif", bgType: "radialPulse" },
+    { name: "1. Emerald Luxury [Neo]", morphism: "neomorphism", head: "#34d399", body: "#059669", food: "#fb7185", accent: "#34d399", secondary: "#047857", font: "'Cinzel', serif", bgType: "emeraldRain" },
+    { name: "2. Cyber Neon [Glass]", morphism: "glass", head: "#00f2fe", body: "#0284c7", food: "#ff0844", accent: "#00f2fe", secondary: "#7928ca", font: "'Orbitron', sans-serif", bgType: "cyberGrid" },
+    { name: "3. Lavender Dream [Clay]", morphism: "claymorphism", head: "#a29bfe", body: "#6c5ce7", food: "#00cec9", accent: "#a29bfe", secondary: "#6c5ce7", font: "'Cinzel', serif", bgType: "waves" },
+    { name: "4. Candy Pop [Clay]", morphism: "claymorphism", head: "#ff7675", body: "#d63031", food: "#fdcb6e", accent: "#ff7675", secondary: "#e84393", font: "'Montserrat', sans-serif", bgType: "floatingBubbles" },
+    { name: "5. Playful Mint [Clay]", morphism: "claymorphism", head: "#55efc4", body: "#00b894", food: "#e84393", accent: "#55efc4", secondary: "#00b894", font: "'Inter', sans-serif", bgType: "radialPulse" },
+    { name: "6. Toybox Yellow [Clay]", morphism: "claymorphism", head: "#ffeaa7", body: "#fdcb6e", food: "#0984e3", accent: "#ffeaa7", secondary: "#fd79a8", font: "'Press Start 2P', cursive", bgType: "floatingBubbles" },
+    { name: "7. Deep Ocean [Glass]", morphism: "glass", head: "#38bdf8", body: "#0369a1", food: "#f43f5e", accent: "#38bdf8", secondary: "#0284c7", font: "'Montserrat', sans-serif", bgType: "waves" },
+    { name: "8. Cosmic Nebula [Glass]", morphism: "glass", head: "#c084fc", body: "#7e22ce", food: "#facc15", accent: "#c084fc", secondary: "#3b82f6", font: "'Chakra Petch', sans-serif", bgType: "starfield" },
+    { name: "9. Cherry Sakura [Glass]", morphism: "glass", head: "#f472b6", body: "#be185d", food: "#4ade80", accent: "#f472b6", secondary: "#fb7185", font: "'Cinzel', serif", bgType: "floatingBubbles" },
+    { name: "10. Dark Mode Charcoal [Neo]", morphism: "neomorphism", head: "#60a5fa", body: "#2563eb", food: "#f87171", accent: "#60a5fa", secondary: "#1d4ed8", font: "'Inter', sans-serif", bgType: "radialPulse" },
+    { name: "11. Soft Ice Blue [Neo]", morphism: "neomorphism", head: "#38bdf8", body: "#0284c7", food: "#fb923c", accent: "#38bdf8", secondary: "#0369a1", font: "'Roboto Mono', monospace", bgType: "waves" },
+    { name: "12. Industrial Steel [Neo]", morphism: "neomorphism", head: "#facc15", body: "#ca8a04", food: "#ef4444", accent: "#facc15", secondary: "#854d0e", font: "'Rajdhani', sans-serif", bgType: "cyberGrid" },
     { name: "13. Neon Matrix [Glow]", morphism: "glowmorphism", head: "#22c55e", body: "#15803d", food: "#facc15", accent: "#22c55e", secondary: "#16a34a", font: "'VT323', monospace", bgType: "matrixRain" },
     { name: "14. Synthwave Sunset [Glow]", morphism: "glowmorphism", head: "#ff007f", body: "#b5005b", food: "#00f2fe", accent: "#ff007f", secondary: "#7928ca", font: "'Rajdhani', sans-serif", bgType: "cyberGrid" },
     { name: "15. Solar Flare [Glow]", morphism: "glowmorphism", head: "#ff9f43", body: "#ee5253", food: "#feca57", accent: "#ff9f43", secondary: "#ee5253", font: "'Chakra Petch', sans-serif", bgType: "radialPulse" },
@@ -737,98 +753,29 @@ const themes = [
     { name: "20. Obsidian Metallic [Skeuo]", morphism: "skeuomorphism", head: "#f1f2f6", body: "#a4b0be", food: "#ff4757", accent: "#f1f2f6", secondary: "#0056b3", font: "'Roboto Mono', monospace", bgType: "starfield" }
 ];
 
-/* --- FIREBASE WITH LOCAL FALLBACK ---
-   To make the leaderboard truly WORLDWIDE (synced live across every player's
-   device, anywhere), you need your own free Firebase project:
-     1. Go to https://console.firebase.google.com and create a project (no cost
-        on the free "Spark" plan for this amount of traffic).
-     2. Enable "Firestore Database" (start in test mode, or lock it down with
-        rules that allow create + read on the "leaderboard" collection).
-     3. Project settings > General > "Your apps" > Web app > copy the config
-        object and paste its values into firebaseConfig below, replacing the
-        YOUR_... placeholders.
-   Until real credentials are added, the game automatically falls back to a
-   local, per-device leaderboard (stored in this browser's localStorage) so
-   the feature still works out of the box — it just won't be shared between
-   players until you connect Firebase. --- */
+/* --- LEADERBOARD LOGIC --- */
 let db = null;
 let firebaseActive = false;
-
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
-
-try {
-    if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
-        firebase.initializeApp(firebaseConfig);
-        db = firebase.firestore();
-        firebaseActive = true;
-    }
-} catch (e) {
-    console.warn("Firebase initialization skipped, using local persistence.");
-    firebaseActive = false;
-}
 
 function updateLeaderboardStatusUI() {
     const label = document.getElementById('leaderboardLabel');
     const note = document.getElementById('leaderboardNote');
-    if (firebaseActive) {
-        label.innerText = "🌐 Top Players (Worldwide)";
-        note.classList.add('hidden');
-    } else {
-        label.innerText = "📍 Top Players (This Device)";
-        note.classList.remove('hidden');
-    }
+    label.innerText = "📍 Top Players (This Device)";
+    note.classList.remove('hidden');
 }
 updateLeaderboardStatusUI();
 
 function saveScore(user, score) {
     if (score <= 0) return;
-    
     const localHigh = parseInt(localStorage.getItem('snake_high_score') || '0', 10);
     if (score > localHigh) {
         localStorage.setItem('snake_high_score', score);
     }
-
-    if (firebaseActive && db) {
-        db.collection('leaderboard').add({
-            user: user,
-            score: score,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }).catch(err => console.warn("Cloud save failed", err));
-    } else {
-        loadLocalLeaderboard(user, score);
-    }
+    loadLocalLeaderboard(user, score);
 }
 
 function loadLeaderboard() {
-    if (firebaseActive && db) {
-        db.collection('leaderboard')
-          .orderBy('score', 'desc')
-          .limit(10)
-          .onSnapshot(snapshot => {
-              const body = document.getElementById('leaderboardBody');
-              body.innerHTML = '';
-              let index = 1;
-              if (snapshot.empty) {
-                  body.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#8b949e;">No high scores yet!</td></tr>`;
-                  return;
-              }
-              snapshot.forEach(doc => {
-                  const data = doc.data();
-                  if (index === 1) document.getElementById('highScore').innerText = data.score;
-                  body.innerHTML += `<tr><td>${index}</td><td>${data.user}</td><td>${data.score}</td></tr>`;
-                  index++;
-              });
-          }, () => loadLocalLeaderboard());
-    } else {
-        loadLocalLeaderboard();
-    }
+    loadLocalLeaderboard();
 }
 
 function loadLocalLeaderboard(currentUser, newScore) {
@@ -846,7 +793,7 @@ function loadLocalLeaderboard(currentUser, newScore) {
     if (localScores.length === 0) {
         const topScore = localStorage.getItem('snake_high_score') || 0;
         document.getElementById('highScore').innerText = topScore;
-        body.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#8b949e;">No high scores stored yet!</td></tr>`;
+        body.innerHTML = `<tr><td colspan="3" style="text-align:center; color: var(--text-muted);">No high scores stored yet!</td></tr>`;
         return;
     }
 
@@ -858,31 +805,63 @@ function loadLocalLeaderboard(currentUser, newScore) {
 
 /* --- PROCEDURAL BACKGROUND GENERATION --- */
 const starfieldStars = Array.from({ length: 60 }, () => ({
-    x: Math.random() * 600,
-    y: Math.random() * 600,
-    size: Math.random() * 2 + 1,
-    speed: Math.random() * 0.5 + 0.2
+    x: Math.random() * 600, y: Math.random() * 600, size: Math.random() * 2 + 1, speed: Math.random() * 0.5 + 0.2
 }));
 
 const matrixDrops = Array.from({ length: 22 }, (_, i) => ({
-    x: i * CELL_SIZE,
-    y: Math.random() * 600,
-    speed: Math.random() * 3 + 2
+    x: i * CELL_SIZE, y: Math.random() * 600, speed: Math.random() * 3 + 2
 }));
 
 const bubbleOrbs = Array.from({ length: 12 }, () => ({
+    x: Math.random() * 600, y: Math.random() * 600, r: Math.random() * 30 + 15, vx: (Math.random() - 0.5) * 1.5, vy: (Math.random() - 0.5) * 1.5
+}));
+
+const emeraldOrbs = Array.from({ length: 35 }, () => ({
     x: Math.random() * 600,
     y: Math.random() * 600,
-    r: Math.random() * 30 + 15,
-    vx: (Math.random() - 0.5) * 1.5,
-    vy: (Math.random() - 0.5) * 1.5
+    radius: Math.random() * 5 + 2,
+    speedY: Math.random() * 1.2 + 0.4,
+    speedX: (Math.random() - 0.5) * 0.3,
+    alpha: Math.random() * 0.6 + 0.25,
+    pulseOffset: Math.random() * Math.PI * 2
 }));
 
 function drawProceduralBackground(type, accentColor) {
     ctx.fillStyle = "#070a12";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    if (type === "cyberGrid") {
+    if (type === "emeraldRain") {
+        emeraldOrbs.forEach(orb => {
+            orb.y += orb.speedY;
+            orb.x += orb.speedX;
+
+            if (orb.y > canvas.height + 10) {
+                orb.y = -10;
+                orb.x = Math.random() * canvas.width;
+            }
+            if (orb.x < -10) orb.x = canvas.width + 10;
+            if (orb.x > canvas.width + 10) orb.x = -10;
+
+            const currentAlpha = orb.alpha + Math.sin(animTime * 3 + orb.pulseOffset) * 0.15;
+            const clampedAlpha = Math.max(0.1, Math.min(1.0, currentAlpha));
+
+            ctx.save();
+            ctx.shadowBlur = orb.radius * 2.5;
+            ctx.shadowColor = "#34d399";
+            
+            const grad = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.radius);
+            grad.addColorStop(0, `rgba(167, 243, 208, ${clampedAlpha})`);
+            grad.addColorStop(0.5, `rgba(52, 211, 153, ${clampedAlpha * 0.8})`);
+            grad.addColorStop(1, "transparent");
+
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(orb.x, orb.y, orb.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        });
+    }
+    else if (type === "cyberGrid") {
         ctx.strokeStyle = accentColor + "22";
         ctx.lineWidth = 1;
         const offset = (animTime * 20) % CELL_SIZE;
@@ -897,9 +876,7 @@ function drawProceduralBackground(type, accentColor) {
         ctx.fillStyle = accentColor;
         starfieldStars.forEach(s => {
             s.y = (s.y + s.speed) % canvas.height;
-            ctx.beginPath();
-            ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2); ctx.fill();
         });
     } 
     else if (type === "waves") {
@@ -946,31 +923,12 @@ function drawProceduralBackground(type, accentColor) {
     }
 }
 
-/* --- HAPTIC FEEDBACK PROFILES ---
-   Each interaction gets a distinct shape so players can feel *what* happened
-   without looking: a single short number = one crisp buzz; an array is a
-   [vibrate, pause, vibrate, pause, ...] rhythm read by navigator.vibrate(). */
-const HAPTIC_PATTERNS = {
-    turn:      8,                      // instant, barely-there tick for direction changes
-    eat:       [15, 30, 15],           // rhythmic double-pulse for a normal pickup
-    golden:    [18, 25, 18, 25, 35],   // richer triple-pulse for the rare golden pickup
-    collision: [70, 40, 90, 40, 130],  // long, heavy, escalating rumble for death
-    start:     25                      // single confirming pulse when a run begins
-};
-
-let lastHapticAt = 0;
+/* --- HAPTICS --- */
 function triggerHaptic(pattern = 'turn') {
     if (!("vibrate" in navigator)) return;
-    const value = typeof pattern === 'string' ? HAPTIC_PATTERNS[pattern] : pattern;
-    if (value === undefined) return;
-
-    // Guard against back-to-back calls (e.g. two quick turns) stomping on each
-    // other's pattern before it can be felt.
-    const now = performance.now();
-    if (now - lastHapticAt < 8) return;
-    lastHapticAt = now;
-
-    try { navigator.vibrate(value); } catch (e) {}
+    const patterns = { turn: 8, eat: [15, 30, 15], golden: [18, 25, 18, 25, 35], collision: [70, 40, 90, 40, 130], start: 25 };
+    const value = patterns[pattern];
+    if (value) try { navigator.vibrate(value); } catch (e) {}
 }
 
 function triggerScreenShake(duration = 0.2) {
@@ -978,14 +936,7 @@ function triggerScreenShake(duration = 0.2) {
 }
 
 function addFloatingText(text, x, y, color = "#fff") {
-    floatingTexts.push({
-        text: text,
-        x: x,
-        y: y,
-        vy: -1.2,
-        alpha: 1.0,
-        color: color
-    });
+    floatingTexts.push({ text: text, x: x, y: y, vy: -1.2, alpha: 1.0, color: color });
 }
 
 function updateFloatingTexts() {
@@ -1018,7 +969,7 @@ function init() {
     document.getElementById('musicVolume').value = musicVolume;
     updateUserDisplay();
     loadLeaderboard();
-    applyTheme(19);
+    applyTheme(0);
     resetGame();
     setupDpadControls();
     setupSwipeControls();
@@ -1034,11 +985,11 @@ function populateThemes() {
         opt.innerText = t.name;
         select.appendChild(opt);
     });
-    select.value = 19;
+    select.value = 0;
 }
 
 function applyTheme(index) {
-    const selectedTheme = themes[index] || themes[19];
+    const selectedTheme = themes[index] || themes[0];
     const root = document.documentElement;
 
     activePrimaryColor = selectedTheme.accent;
@@ -1050,13 +1001,13 @@ function applyTheme(index) {
 
     const m = selectedTheme.morphism;
     if (m === "glass") {
-        root.style.setProperty('--card-bg', 'rgba(18, 25, 39, 0.55)');
-        root.style.setProperty('--card-border', '1px solid rgba(255, 255, 255, 0.18)');
-        root.style.setProperty('--card-shadow', '0 8px 32px 0 rgba(0, 0, 0, 0.5)');
-        root.style.setProperty('--card-backdrop', 'blur(16px)');
+        root.style.setProperty('--card-bg', 'rgba(16, 22, 36, 0.65)');
+        root.style.setProperty('--card-border', '1px solid rgba(255, 255, 255, 0.15)');
+        root.style.setProperty('--card-shadow', '0 16px 40px rgba(0, 0, 0, 0.6)');
+        root.style.setProperty('--card-backdrop', 'blur(20px)');
         root.style.setProperty('--btn-bg', `linear-gradient(135deg, ${selectedTheme.accent}, ${activeSecondaryColor})`);
-        root.style.setProperty('--btn-shadow', `0 4px 15px ${selectedTheme.accent}66`);
-        root.style.setProperty('--btn-border', 'none');
+        root.style.setProperty('--btn-shadow', `0 4px 20px ${selectedTheme.accent}55`);
+        root.style.setProperty('--btn-border', '1px solid rgba(255, 255, 255, 0.2)');
         root.style.setProperty('--btn-radius', '12px');
     } else if (m === "neomorphism") {
         root.style.setProperty('--card-bg', '#181e2a');
@@ -1112,6 +1063,7 @@ function resetGame() {
     score = 0;
     comboCount = 0;
     stepProgress = 0;
+    renderHeadAngle = 0;
     isPaused = false;
     swallowBulges = [];
     floatingTexts = [];
@@ -1151,15 +1103,15 @@ function togglePause() {
     refreshMusicState();
 }
 
+/* --- GAME LOOP & ULTRA SMOOTH INTERPOLATION --- */
 function renderLoop(timestamp) {
     animTime += 0.015;
-
     renderMainBackground();
 
     if (isRunning && !isPaused) {
         const tickRate = difficulties[currentDifficulty];
         const elapsed = timestamp - lastTickTime;
-        stepProgress = elapsed / tickRate;
+        stepProgress = Math.min(1.0, Math.max(0.0, elapsed / tickRate));
 
         if (elapsed >= tickRate) {
             updateLogic();
@@ -1200,19 +1152,13 @@ function updateLogic() {
     }
 
     for (let i = swallowBulges.length - 1; i >= 0; i--) {
-        swallowBulges[i].index += 0.35;
-        if (swallowBulges[i].index >= snake.length) {
-            swallowBulges.splice(i, 1);
-        }
+        swallowBulges[i].index += 0.2;
+        if (swallowBulges[i].index >= snake.length) swallowBulges.splice(i, 1);
     }
 
     if (newX === food.x && newY === food.y) {
         const now = performance.now();
-        if (now - lastEatTime < 2800) {
-            comboCount++;
-        } else {
-            comboCount = 1;
-        }
+        comboCount = (now - lastEatTime < 2800) ? comboCount + 1 : 1;
         lastEatTime = now;
 
         const basePoints = food.isGolden ? 30 : 10;
@@ -1254,9 +1200,7 @@ function spawnFood() {
         y: Math.floor(Math.random() * GRID_CELLS),
         isGolden: Math.random() < 0.2
     };
-    if (snake.some(s => s.x === food.x && s.y === food.y)) {
-        spawnFood();
-    }
+    if (snake.some(s => s.x === food.x && s.y === food.y)) spawnFood();
 }
 
 function checkCollision(x, y) {
@@ -1277,22 +1221,21 @@ function handleGameOver() {
     document.getElementById('gameOverlay').classList.remove('hidden');
 }
 
+/* --- BEZIER / HERMITE SMOOTH RENDERING --- */
 function drawGameMap() {
-    const activeIndex = document.getElementById('themeSelect').value || 19;
+    const activeIndex = document.getElementById('themeSelect').value || 0;
     const theme = themes[activeIndex];
 
     ctx.save();
 
     if (screenShakeTime > 0) {
         screenShakeTime -= 0.016;
-        const dx = (Math.random() - 0.5) * 8;
-        const dy = (Math.random() - 0.5) * 8;
-        ctx.translate(dx, dy);
+        ctx.translate((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8);
     }
 
     drawProceduralBackground(theme.bgType, theme.accent);
 
-    // --- RENDER DYNAMIC FOOD ---
+    // Render Food
     const foodX = food.x * CELL_SIZE + CELL_SIZE / 2;
     const foodY = food.y * CELL_SIZE + CELL_SIZE / 2;
     const floatBob = Math.sin(animTime * 6) * 3;
@@ -1301,7 +1244,6 @@ function drawGameMap() {
 
     ctx.shadowBlur = food.isGolden ? 22 : 14;
     ctx.shadowColor = foodColor;
-    
     ctx.strokeStyle = foodColor + "88";
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -1319,7 +1261,7 @@ function drawGameMap() {
     ctx.fill();
     ctx.shadowBlur = 0;
 
-    // --- CALCULATE ORGANIC SMOOTH SNAKE SEGMENT POSITIONS ---
+    // Calculate Interpolated Coordinates for Segments
     const totalSegments = snake.length;
     const interpPos = [];
 
@@ -1330,104 +1272,88 @@ function drawGameMap() {
         if (isRunning && !isPaused) {
             let dx = seg.x - seg.prevX;
             let dy = seg.y - seg.prevY;
+            
+            // Seamless screen wrap handling
             if (Math.abs(dx) > 1) dx = dx > 0 ? -1 : 1;
             if (Math.abs(dy) > 1) dy = dy > 0 ? -1 : 1;
 
-            drawX = (seg.prevX + dx * Math.min(stepProgress, 1)) * CELL_SIZE + CELL_SIZE / 2;
-            drawY = (seg.prevY + dy * Math.min(stepProgress, 1)) * CELL_SIZE + CELL_SIZE / 2;
+            drawX = (seg.prevX + dx * stepProgress) * CELL_SIZE + CELL_SIZE / 2;
+            drawY = (seg.prevY + dy * stepProgress) * CELL_SIZE + CELL_SIZE / 2;
         } else {
             drawX = seg.x * CELL_SIZE + CELL_SIZE / 2;
             drawY = seg.y * CELL_SIZE + CELL_SIZE / 2;
         }
 
-        // Apply sinusoidal slithering wave perpendicular to motion with edge wrap normalization
-        if (i > 0 && i < totalSegments - 1) {
-            const wave = Math.sin(animTime * 8 - i * 0.55) * 2.2;
-            let pX = snake[i - 1].x - snake[i + 1].x;
-            let pY = snake[i - 1].y - snake[i + 1].y;
-
-            if (pX > 1) pX -= GRID_CELLS;
-            if (pX < -1) pX += GRID_CELLS;
-            if (pY > 1) pY -= GRID_CELLS;
-            if (pY < -1) pY += GRID_CELLS;
-
-            const len = Math.hypot(pX, pY) || 1;
-            drawX += (-pY / len) * wave;
-            drawY += (pX / len) * wave;
-        }
-
         interpPos.push({ x: drawX, y: drawY });
     }
 
-    // --- ORGANIC SNAKE BODY CAPSULE RENDERING WITH WRAP-FIX ---
-    for (let i = totalSegments - 1; i >= 0; i--) {
-        const curr = interpPos[i];
-        
-        let scale = 1.0;
-        if (i > 0) {
-            const taperProgress = i / (totalSegments - 1);
-            scale = 1.0 - (Math.pow(taperProgress, 1.2) * 0.35); 
-        }
-
-        swallowBulges.forEach(b => {
-            const dist = Math.abs(b.index - i);
-            if (dist < 1.5) {
-                scale *= 1 + (1.5 - dist) * 0.25 * (b.scale - 1);
-            }
-        });
-
-        const radius = Math.max(4, (CELL_SIZE / 2 - 2) * scale);
-
+    // Continuous Curved Spine Body Path
+    if (interpPos.length > 1) {
         ctx.save();
-        ctx.fillStyle = i === 0 ? theme.head : theme.body;
+        ctx.strokeStyle = theme.body;
+        ctx.fillStyle = theme.body;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = theme.body;
 
-        if (i === 0) {
-            ctx.shadowBlur = 14;
-            ctx.shadowColor = theme.head;
-        }
-
-        // Connect adjacent segments only if they are not wrapping across the screen edge
-        if (i < totalSegments - 1) {
-            const next = interpPos[i + 1];
-            const segDistance = Math.hypot(next.x - curr.x, next.y - curr.y);
-
-            // CELL_SIZE * 2 threshold prevents capsule stretching across map boundaries
-            if (segDistance < CELL_SIZE * 2) {
-                const angle = Math.atan2(next.y - curr.y, next.x - curr.x);
-                
-                ctx.beginPath();
-                ctx.arc(curr.x, curr.y, radius, angle + Math.PI / 2, angle - Math.PI / 2);
-                ctx.arc(next.x, next.y, radius * 0.9, angle - Math.PI / 2, angle + Math.PI / 2);
-                ctx.closePath();
-                ctx.fill();
-
-                ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
-                ctx.lineWidth = 1;
-                ctx.stroke();
-            } else {
-                // Render clean rounded cap for segments wrapping around map boundary
-                ctx.beginPath();
-                ctx.arc(curr.x, curr.y, radius, 0, Math.PI * 2);
-                ctx.fill();
+        for (let i = totalSegments - 1; i >= 0; i--) {
+            const curr = interpPos[i];
+            
+            let scale = 1.0;
+            if (i > 0) {
+                const taperProgress = i / (totalSegments - 1);
+                scale = 1.0 - (Math.pow(taperProgress, 1.2) * 0.35); 
             }
-        } else {
+
+            swallowBulges.forEach(b => {
+                const dist = Math.abs(b.index - i);
+                if (dist < 1.5) scale *= 1 + (1.5 - dist) * 0.25 * (b.scale - 1);
+            });
+
+            const radius = Math.max(4, (CELL_SIZE / 2 - 2) * scale);
+
+            if (i === 0) {
+                ctx.fillStyle = theme.head;
+                ctx.shadowColor = theme.head;
+                ctx.shadowBlur = 16;
+            }
+
+            // Smooth curved joins via midpoints
+            if (i < totalSegments - 1) {
+                const next = interpPos[i + 1];
+                const distance = Math.hypot(next.x - curr.x, next.y - curr.y);
+
+                if (distance < CELL_SIZE * 2) {
+                    const midX = (curr.x + next.x) / 2;
+                    const midY = (curr.y + next.y) / 2;
+                    ctx.beginPath();
+                    ctx.arc(midX, midY, radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
             ctx.beginPath();
             ctx.arc(curr.x, curr.y, radius, 0, Math.PI * 2);
             ctx.fill();
         }
-
         ctx.restore();
     }
 
-    // --- SNAKE HEAD ANATOMY (EYES & FLICKERING TONGUE) ---
+    // Head Details with Smooth Rotation Inertia
     if (totalSegments > 0) {
         const headPos = interpPos[0];
-        const angle = Math.atan2(dirY, dirX);
+        const targetAngle = Math.atan2(dirY, dirX);
+
+        // Smooth angle lerping
+        let diff = targetAngle - renderHeadAngle;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        renderHeadAngle += diff * 0.25;
 
         ctx.save();
         ctx.translate(headPos.x, headPos.y);
-        ctx.rotate(angle);
+        ctx.rotate(renderHeadAngle);
 
+        // Snake Tongue
         if (Math.sin(animTime * 12) > 0.35) {
             const tongueLen = 12 + Math.sin(animTime * 20) * 4;
             ctx.strokeStyle = "#ff4757";
@@ -1441,12 +1367,13 @@ function drawGameMap() {
             ctx.stroke();
         }
 
+        // Eyes tracking food
         const eyeOffset = 6;
         const eyeRadius = 3.5;
         const pupilRadius = 1.8;
 
         const foodAngleWorld = Math.atan2(foodY - headPos.y, foodX - headPos.x);
-        const relFoodAngle = foodAngleWorld - angle;
+        const relFoodAngle = foodAngleWorld - renderHeadAngle;
         const pupilX = Math.cos(relFoodAngle) * 1.2;
         const pupilY = Math.sin(relFoodAngle) * 1.2;
 
@@ -1465,6 +1392,7 @@ function drawGameMap() {
         ctx.restore();
     }
 
+    // Particle FX Rendering
     particles.forEach(p => {
         ctx.fillStyle = p.color;
         ctx.globalAlpha = Math.max(0, p.alpha);
@@ -1475,12 +1403,11 @@ function drawGameMap() {
     ctx.globalAlpha = 1.0;
 
     drawFloatingTexts();
-
     ctx.restore();
 }
 
 function createFoodParticles(x, y, isGolden = false) {
-    const activeIndex = document.getElementById('themeSelect').value || 19;
+    const activeIndex = document.getElementById('themeSelect').value || 0;
     const foodColor = isGolden ? "#facc15" : themes[activeIndex].food;
     const particleCount = isGolden ? 22 : 12;
 
@@ -1507,65 +1434,46 @@ function updateParticles() {
     }
 }
 
-/* --- RESPONSIVE INPUT SYSTEM --- */
+/* --- CONTROLS --- */
 function setDirection(x, y) {
     if (!isRunning || isPaused) return;
-
     const lastDir = inputQueue.length > 0 ? inputQueue[inputQueue.length - 1] : { x: dirX, y: dirY };
 
-    if (x !== 0 && lastDir.x === 0) {
-        if (inputQueue.length < 2) {
-            inputQueue.push({ x: x, y: 0 });
-            playSound('turn');
-            triggerHaptic('turn');
-        }
+    if (x !== 0 && lastDir.x === 0 && inputQueue.length < 2) {
+        inputQueue.push({ x: x, y: 0 });
+        playSound('turn');
+        triggerHaptic('turn');
     }
-    if (y !== 0 && lastDir.y === 0) {
-        if (inputQueue.length < 2) {
-            inputQueue.push({ x: 0, y: y });
-            playSound('turn');
-            triggerHaptic('turn');
-        }
+    if (y !== 0 && lastDir.y === 0 && inputQueue.length < 2) {
+        inputQueue.push({ x: 0, y: y });
+        playSound('turn');
+        triggerHaptic('turn');
     }
 }
 
 function setupDpadControls() {
-    const supportsPointer = typeof window.PointerEvent !== "undefined";
-
     document.querySelectorAll('.dpad-btn').forEach(btn => {
         const dx = parseInt(btn.dataset.dx, 10);
         const dy = parseInt(btn.dataset.dy, 10);
 
         const activate = (e) => {
             e.preventDefault();
-            initAudio(); // unlocks/resumes the AudioContext on first real user gesture
+            initAudio(); 
             setDirection(dx, dy);
             btn.classList.add('is-pressed');
         };
         const release = () => btn.classList.remove('is-pressed');
 
-        if (supportsPointer) {
-            // pointerdown collapses mouse/touch/pen into one immediate event and
-            // skips the ~300ms synthetic click delay some mobile browsers still add.
-            btn.addEventListener('pointerdown', activate, { passive: false });
-            btn.addEventListener('pointerup', release);
-            btn.addEventListener('pointerleave', release);
-            btn.addEventListener('pointercancel', release);
-        } else {
-            // Fallback for the rare engine without Pointer Events support.
-            btn.addEventListener('touchstart', activate, { passive: false });
-            btn.addEventListener('touchend', release);
-            btn.addEventListener('touchcancel', release);
-            btn.addEventListener('click', activate);
-        }
+        btn.addEventListener('pointerdown', activate, { passive: false });
+        btn.addEventListener('pointerup', release);
+        btn.addEventListener('pointerleave', release);
+        btn.addEventListener('pointercancel', release);
     });
 }
 
 function setupSwipeControls() {
-    let touchStartX = 0;
-    let touchStartY = 0;
+    let touchStartX = 0, touchStartY = 0;
     const SWIPE_THRESHOLD = 18;
-
     const container = document.querySelector('.canvas-container');
 
     container.addEventListener('touchstart', e => {
@@ -1576,12 +1484,8 @@ function setupSwipeControls() {
 
     container.addEventListener('touchmove', e => {
         if (!isRunning || isPaused || !e.touches.length) return;
-        
-        let touchX = e.touches[0].clientX;
-        let touchY = e.touches[0].clientY;
-        
-        let diffX = touchX - touchStartX;
-        let diffY = touchY - touchStartY;
+        let diffX = e.touches[0].clientX - touchStartX;
+        let diffY = e.touches[0].clientY - touchStartY;
 
         if (Math.abs(diffX) > SWIPE_THRESHOLD || Math.abs(diffY) > SWIPE_THRESHOLD) {
             if (Math.abs(diffX) > Math.abs(diffY)) {
@@ -1589,8 +1493,8 @@ function setupSwipeControls() {
             } else {
                 setDirection(0, diffY > 0 ? 1 : -1);
             }
-            touchStartX = touchX;
-            touchStartY = touchY;
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
         }
         if (e.cancelable) e.preventDefault();
     }, { passive: false });
@@ -1598,19 +1502,17 @@ function setupSwipeControls() {
 
 window.addEventListener('keydown', e => {
     const key = e.key;
-    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " ", "w", "a", "s", "d", "W", "A", "S", "D", "h", "j", "k", "l"].includes(key)) {
-        if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(key)) {
-            e.preventDefault();
-        }
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " ", "w", "a", "s", "d"].includes(key)) {
+        if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(key)) e.preventDefault();
     }
 
     if (key === ' ' && !isRunning) startGame();
     else if ((key === ' ' || key === 'p' || key === 'P') && isRunning) togglePause();
     
-    if (['ArrowUp', 'w', 'W', 'k', 'K', '8'].includes(key)) setDirection(0, -1);
-    if (['ArrowDown', 's', 'S', 'j', 'J', '2'].includes(key)) setDirection(0, 1);
-    if (['ArrowLeft', 'a', 'A', 'h', 'H', '4'].includes(key)) setDirection(-1, 0);
-    if (['ArrowRight', 'd', 'D', 'l', 'L', '6'].includes(key)) setDirection(1, 0);
+    if (['ArrowUp', 'w', 'W'].includes(key)) setDirection(0, -1);
+    if (['ArrowDown', 's', 'S'].includes(key)) setDirection(0, 1);
+    if (['ArrowLeft', 'a', 'A'].includes(key)) setDirection(-1, 0);
+    if (['ArrowRight', 'd', 'D'].includes(key)) setDirection(1, 0);
 });
 
 function changeDifficulty() {
